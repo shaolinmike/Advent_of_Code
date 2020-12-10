@@ -43,33 +43,21 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 
 import itertools
 
-def solution_1( answer, data ):
-	for num in itertools.combinations( data, 2 ):
-		if sum( num ) == answer:
-			values = ( [ data.index( val ) for val in num ] )
-			print( "Solution 1: {0}".format( data[ values[ 0 ] ] * data[ values[ 1 ] ] ) )
-
-
-def solution_2( answer, data ):
-	for num in itertools.combinations( data, 3 ):
-		if sum( num ) == answer:
-			values = ( [ data.index( val ) for val in num ] )
-			print( "Solution 2: {0}".format( data[ values[ 0 ] ] * data[ values[ 1 ] ] * data[ values[ 2 ] ] ) )
-
 
 def solution( answer, data, num_inputs = 1 ):
 	result = [ 1 ]
 	for num in itertools.combinations( data, num_inputs ):
 		if sum( num ) == answer:
 			values = ( [ data.index( val ) for val in num ] )
-			[ result.__setitem__( 0, data[ num ] * result.__getitem__( 0 ) ) for num in values ][ 0 ]
-			return result
+			# Multiply list elements by each other, without functools
+			[ result.__setitem__( 0, data[ num ] * result.__getitem__( 0 ) ) for num in values ]
+			return result[ 0 ]
 
 
 
 if __name__ == "__main__":
-	answer = 2020
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_1_input.txt'
+	answer = 2020
 	data = [ ]
 
 	with open( input, 'r' ) as input_file:
@@ -77,9 +65,6 @@ if __name__ == "__main__":
 
 	answer_1 = solution( answer, data, num_inputs = 2 )
 	answer_2 = solution( answer, data, num_inputs = 3 )
+
 	print( 'The answer to Question 1 is: {0}'.format( answer_1 ) )
 	print( 'The answer to Question 2 is: {0}'.format( answer_2 ) )
-
-	solution_1( answer, data )
-	solution_2( answer, data )
-
