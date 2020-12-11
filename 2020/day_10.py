@@ -158,11 +158,11 @@ def test_adapter_config( test_adapters ):
 
 	for idx, x in enumerate( test_adapters ):
 		if idx != len( test_adapters ) - 1:
-			print( '\t\t\tOptimzing... {0} : {1}'.format( x, test_adapters[ idx + 1 ] ) )
+			# print( '\t\t\tOptimzing... {0} : {1}'.format( x, test_adapters[ idx + 1 ] ) )
 			if abs( x - test_adapters[ idx + 1 ] ) not in [ 1, 2, 3 ]:
 				return False
 
-	print( '\t\t\t\t\tPass!')
+	# print( '\t\t\t\t\tPass!')
 	return True
 
 
@@ -171,13 +171,13 @@ def find_adapters_by_joltage_diff( adapters, diff ):
 	plugged_adapters = sorted( adapters )
 
 	if abs( plugged_adapters[ 0 ] - 0 ) == diff:
-		valid_adapters.append( 0 )
+		valid_adapters.append( plugged_adapters[ 0 ] )
 
 	for idx, x in enumerate( plugged_adapters ):
 		if idx != len( adapters ) - 1:
 			if abs( x - plugged_adapters[ idx + 1 ] ) == diff:
 				valid_adapters.append( x )
-		print( valid_adapters )
+		# print( valid_adapters )
 
 	if 3 == diff:
 		valid_adapters.append( valid_adapters[ -1 ] + 3 )
@@ -194,7 +194,7 @@ def optimize_adapters( adapters ):
 	for x in one_joltage_adapters:
 		test_case = plugged_adapters.copy( )
 		test_case.remove( x )
-		print( '\t\tOptimzation run: {0}'.format( test_case ) )
+		# print( '\t\tOptimzation run: {0}'.format( test_case ) )
 		if test_adapter_config( test_case ):
 			valid_adapters.append( test_case )
 
@@ -211,8 +211,6 @@ def find_optmized_configs( adapters ):
 		result = [ x for x in output if x not in optimized_configs ]
 		# print( '{0}\n\n{1}\n******************'.format( optimized_configs, result ) )
 		# print( '{0}\n******************'.format( result ) )
-		for x in result:
-			print( '{0}'.format( x ) )
 		optimized_configs.extend( result )
 		for x in result:
 			valid_adapter_configs.append( x )
