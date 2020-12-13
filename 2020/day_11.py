@@ -379,10 +379,10 @@ def get_occupied_seats( data, adjacent = True ):
 	old_result = [ ]
 	i = 1
 
-	print( 'Pass #0')
-	for x in result:
-		print( '\t{0}'.format( x ) )
-	print( '' )
+	# print( 'Pass #0')
+	# for x in result:
+		# print( '\t{0}'.format( x ) )
+	# print( '' )
 
 	while result != old_result:
 		old_result = result.copy( )
@@ -402,10 +402,12 @@ def get_occupied_seats( data, adjacent = True ):
 
 if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_11_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_11_input.txt'
+
 	data = [ ]
 
 	with open( input, 'r' ) as input_file:
 		data = [ line.strip( ) for line in input_file.readlines( ) ]
 
-	# get_occupied_seats( test_data_1 )
+	get_occupied_seats( data )
 	get_occupied_seats( data, adjacent = False )

@@ -137,7 +137,8 @@ def find_my_seat( assigned_seats ):
 
 
 if __name__ == "__main__":
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_5_input.txt'
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_05_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_05_input.txt'
 
 	data = [ ]
 	row = [ ]

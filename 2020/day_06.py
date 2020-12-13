@@ -136,7 +136,9 @@ def criteria_two( data ):
 
 
 if __name__ == "__main__":
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_6_input.txt'
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_06_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_06_input.txt'
+
 	data = [ ]
 	yes_answers = 0
 

@@ -148,7 +148,9 @@ def find_encryption_set( data, desired_val ):
 
 if __name__ == "__main__":
 	DEBUG = False
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_9_input.txt'
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_09_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_09_input.txt'
+
 	data = [ ]
 	bad_number = 0
 	encryption_weakness = 0

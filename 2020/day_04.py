@@ -203,86 +203,87 @@ def verify_data( passport_entry, expanded_check = True ):
 		if field not in passport_entry.keys( ):
 			missing_fields.append( field )
 
-			if field !=  'cid':
+			if field != 'cid':
 				result = False
 
-		if expanded_check and field not in missing_fields:
-			if field == BYR:
-				if int( passport_entry[ BYR ] ) not in range( 1920, 2003 ):
-					result = False
-					invalid_fields.append( BYR )
+		# if expanded_check and field not in missing_fields:
+			# if field == BYR:
+				# if int( passport_entry[ BYR ] ) not in range( 1920, 2003 ):
+					# result = False
+					# invalid_fields.append( BYR )
 
-			if field == IYR:
-				if int( passport_entry[ IYR ] ) not in range( 2010, 2021 ):
-					result = False
-					invalid_fields.append( IYR )
+			# if field == IYR:
+				# if int( passport_entry[ IYR ] ) not in range( 2010, 2021 ):
+					# result = False
+					# invalid_fields.append( IYR )
 
-			if field == EYR:
-				if int( passport_entry[ EYR ] ) not in range( 2020, 2031 ):
-					result = False
-					invalid_fields.append( EYR )
+			# if field == EYR:
+				# if int( passport_entry[ EYR ] ) not in range( 2020, 2031 ):
+					# result = False
+					# invalid_fields.append( EYR )
 
-			if field == HGT:
-				height = passport_entry[ HGT ]
-				height_val = 0
-				if 'cm' in height:
-					height_val = int( height.split( 'cm' )[ 0 ] )
-					if int( height_val ) not in range( 150, 194 ):
-						result = False
-						invalid_fields.append( HGT )
+			# if field == HGT:
+				# height = passport_entry[ HGT ]
+				# height_val = 0
+				# if 'cm' in height:
+					# height_val = int( height.split( 'cm' )[ 0 ] )
+					# if int( height_val ) not in range( 150, 194 ):
+						# result = False
+						# invalid_fields.append( HGT )
 
-				elif 'in' in height:
-					height_val = int( height.split( 'in' )[ 0 ] )
-					if int( height_val ) not in range( 59, 77 ):
-						result = False
-						invalid_fields.append( HGT )
+				# elif 'in' in height:
+					# height_val = int( height.split( 'in' )[ 0 ] )
+					# if int( height_val ) not in range( 59, 77 ):
+						# result = False
+						# invalid_fields.append( HGT )
 
-				else:
-					result = False
-					invalid_fields.append( HGT )
+				# else:
+					# result = False
+					# invalid_fields.append( HGT )
 
-			if field == HCL:
-				hair_col = passport_entry[ HCL ].split( '#' )
+			# if field == HCL:
+				# hair_col = passport_entry[ HCL ].split( '#' )
 
-				if len( hair_col ) == 2:
-					hair_val = hair_col[ 1 ]
-					if len( hair_val ) == 6:
-						if int( hair_val, 16 ):
-							pass
-				else:
-					result = False
-					invalid_fields.append( HCL )
+				# if len( hair_col ) == 2:
+					# hair_val = hair_col[ 1 ]
+					# if len( hair_val ) == 6:
+						# if int( hair_val, 16 ):
+							# pass
+				# else:
+					# result = False
+					# invalid_fields.append( HCL )
 
-			if field == ECL:
-				eye_colors = [ 'amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth' ]
-				if passport_entry[ ECL ] not in eye_colors:
-					result = False
-					invalid_fields.append( ECL )
+			# if field == ECL:
+				# eye_colors = [ 'amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth' ]
+				# if passport_entry[ ECL ] not in eye_colors:
+					# result = False
+					# invalid_fields.append( ECL )
 
-			if field == PID:
-				pid = passport_entry[ PID ]
-				if len( pid ) != 9 or type( int( pid ) ) != int:
-					result = False
-					invalid_fields.append( PID )
+			# if field == PID:
+				# pid = passport_entry[ PID ]
+				# if len( pid ) != 9 or type( int( pid ) ) != int:
+					# result = False
+					# invalid_fields.append( PID )
 
 	return result, missing_fields, invalid_fields
 
 
 
 if __name__ == "__main__":
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_4_input.txt'
+	# input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_04_input.txt'
+	input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_04_input.txt'
+
 	data = [ ]
 	passport_db = [ ]
 
 	with open( input, 'r' ) as input_file:
 		data = [ line for line in input_file.readlines( ) ]
 		data_dict = { }
-		line_num = 0
-		expanded_check = True
+		expanded_check = False
 
+		# data = test_data
 
-		for _, line in enumerate( data ):
-			line_num += 1
+		for line_num, line in enumerate( data ):
 
 			if line != '\n':
 				new_attributes = ast.literal_eval( "{'" + line.replace( ' ', "', '" ).replace( ":", "' : '" ).strip( ) + "'}" )
@@ -306,11 +307,12 @@ if __name__ == "__main__":
 														 cid = cid )
 					passport_db.append( new_entry )
 
+
 				else:
 					if expanded_check:
-						print( '[ {0} ] Missing fields: {1}\t\tInvalid Fields: {2}'.format( line_num, missing_fields, invalid_fields ) )
+						print( '[ {0} ] Missing fields: {1}\t\tInvalid Fields: {2}'.format( line_num + 1, missing_fields, invalid_fields ) )
 					else:
-						print( '[ {0} ] Missing fields: {1}'.format( line_num, missing_fields ) )
+						print( '[ {0} ] Missing fields: {1}'.format( line_num + 1, missing_fields ) )
 
 				data_dict = { }
 

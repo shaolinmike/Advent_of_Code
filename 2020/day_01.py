@@ -56,7 +56,9 @@ def solution( answer, data, num_inputs = 1 ):
 
 
 if __name__ == "__main__":
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_1_input.txt'
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_01_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_01_input.txt'
+
 	answer = 2020
 	data = [ ]
 

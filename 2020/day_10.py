@@ -168,28 +168,21 @@ def find_configs_by_joltage_diff( adapters, diff ):
 			if abs( x - plugged_adapters[ -1 ] + 3 ) == diff:
 				valid_adapters.append( plugged_adapters[ -1 ] + 3 )
 
-		# print( '{0} : {1}\t\t{2}'.format( idx, x, plugged_adapters ) )
-
 	return valid_adapters
 
 
-def test_adapter_config( test_adapters ):
+def test_adapter_config( test_case ):
 	valid_adapters = [ ]
-	plugged_adapters = sorted( test_adapters )
+	plugged_adapters = sorted( test_case )
 
 	if abs( 0 - plugged_adapters[ 0 ]) not in [ 1, 2, 3 ]:
 		return [ ]
 
 	for idx, x in enumerate( plugged_adapters ):
-		if idx != len( test_adapters ) - 1:
+		if idx != len( test_case ) - 1:
 			if abs( x - plugged_adapters[ idx + 1 ] ) in [ 1, 2, 3 ]:
 				valid_adapters.append( x )
 				# print( '\t[ {0} ] : {1}'.format( x, plugged_adapters ) )
-			else:
-				return [ ]
-		elif idx == len( test_adapters ):
-			if abs( x - plugged_adapters[ idx + 1 ] ) in [ 1, 2, 3 ]:
-				valid_adapters.append( x )
 			else:
 				return [ ]
 
@@ -198,22 +191,18 @@ def test_adapter_config( test_adapters ):
 
 def optimize_adapters( adapter_configs ):
 	valid_adapters = [ ]
-
 	plugged_adapters = sorted( adapter_configs )
+
+	# Find all adapters that can be optimized out
 	one_joltage_configs = deque( find_configs_by_joltage_diff( plugged_adapters, 1 ) )
 
+	# Recursively test the removal of each 1J adapter from the set of adapters
 	while one_joltage_configs:
 		test_case = plugged_adapters.copy( )
 		test_case.remove( one_joltage_configs.popleft( )  )
 		if test_adapter_config( test_case ):
 			valid_adapters.append( test_case )
-
-	# for x in one_joltage_configs:
-		# test_case = plugged_adapters.copy( )
-		# test_case.remove( x )
-		# # print( '{0}'.format( x ) )
-		# if test_adapter_config( test_case ):
-			# valid_adapters.append( test_case )
+			# print( '{0}: {1}'.format( [ x for x in plugged_adapters if x not in test_case ], test_case ) )
 
 	return valid_adapters
 
@@ -228,61 +217,32 @@ def find_optimized_configs( adapters ):
 	while valid_adapter_configs:
 		output = optimize_adapters( valid_adapter_configs.popleft( ) )
 		result = [ x for x in output if x not in optimized_configs ]
-		# print( '{0}\n\n{1}\n******************'.format( optimized_configs, result ) )
-		# print( '{0}\n******************'.format( result ) )
 		optimized_configs.extend( result )
 		if result:
 			valid_adapter_configs.extend( result )
-		# for x in result:
-			# valid_adapter_configs.append( x )
 
-	temp = [ x for x in optimized_configs if x ]
-	config_set = set( tuple( x ) for x in temp )
-	return optimized_configs
-
-
-def find_optimized_configs2( adapters ):
-	plugged_adapters = sorted( adapters )
-	optimized_configs = [ ]
-	valid_adapter_configs = deque( [ plugged_adapters ] )
-	one_joltage_configs = find_configs_by_joltage_diff( data, 1 )
-
-	while valid_adapter_configs:
-		output = optimize_adapters( valid_adapter_configs.popleft( ) )
-		result = [ x for x in output if x not in optimized_configs ]
-		# print( '{0}\n\n{1}\n******************'.format( optimized_configs, result ) )
-		# print( '{0}\n******************'.format( result ) )
-		optimized_configs.append( result )
-		if result:
-			valid_adapter_configs.append( result )
-		# for x in result:
-			# valid_adapter_configs.append( x )
-
-	config_set = set( tuple( x ) for x in optimized_configs )
 	return optimized_configs
 
 
 
 if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_10_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_10_input.txt'
+
 	data = [ ]
 
 	with open( input, 'r' ) as input_file:
 		data = [ int( line.strip( ) ) for line in input_file.readlines( ) ]
 
-	data = test_data_2
+	# data = test_data_2
 
 	one_joltage_configs = find_configs_by_joltage_diff( data, 1 )
 	three_joltage_configs = find_configs_by_joltage_diff( data, 3 )
-	valid_optimizations = find_optimized_configs( data )
+	# valid_optimizations = find_optimized_configs( data )
 
-	# for x in one_joltage_adapters:
-		# print( '\t{0}'.format( x ) )
-	# print( )
 	print( '+/- 1J adapters: {0}'.format( len( one_joltage_configs ) ) )
-
-	# for x in three_joltage_adapters:
-		# print( '\t{0}'.format( x ) )
-	# print( )
 	print( '+/- 3J adapters: {0}'.format( len( three_joltage_configs ) ) )
-	print( '\nTotal possible configurations: {0}'.format( len( valid_optimizations ) ) )
+	# print( '\nTotal possible configurations: {0}'.format( len( valid_optimizations ) ) )
+
+	# for x in valid_optimizations:
+		# print( x )

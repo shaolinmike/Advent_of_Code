@@ -187,7 +187,9 @@ def parse_data( data ):
 
 
 if __name__ == "__main__":
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_7_input.txt'
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_07_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_07_input.txt'
+
 	data = [ ]
 
 	with open( input, 'r' ) as input_file:

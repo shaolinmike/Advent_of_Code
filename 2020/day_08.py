@@ -198,7 +198,9 @@ def run( data ):
 
 
 if __name__ == "__main__":
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_8_input.txt'
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_08_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_08_input.txt'
+
 	data = [ ]
 	line_num = 0
 
