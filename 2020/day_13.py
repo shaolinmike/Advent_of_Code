@@ -56,4 +56,6 @@ if __name__ == "__main__":
 	data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		data = [ line.strip( ) for line in input_file.readlines( ) ]
+		raw_data = input_file.read( ).strip( )
+
+	print
