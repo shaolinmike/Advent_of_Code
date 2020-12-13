@@ -212,6 +212,9 @@ Again, at this point, people stop shifting around and the seating area reaches e
 
 Given the new visibility method and the rule change for occupied seats becoming empty, once equilibrium is reached, how many seats end up occupied?
 
+Your puzzle answer was 2119.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
 
 '''
 
@@ -226,9 +229,30 @@ test_data_1 = [ 'L.LL.LL.LL',
 					 '..L.L.....',
 					 'LLLLLLLLLL',
 					 'L.LLLLLL.L',
-					 'L.LLLLL.LL',
-					]
+					 'L.LLLLL.LL' ]
 
+test_data_2 = [ '.......#.',
+					 '...#.....',
+					 '.#.......',
+					 '.........',
+					 '..#L....#',
+					 '....#....',
+					 '.........',
+					 '#........',
+					 '...#.....' ]
+
+
+test_data_3 = [ '.............',
+					 '.L.L.#.#.#.#.',
+					 ',.............' ]
+
+test_data_4 = [ '.##.##.',
+					 '#.#.#.#',
+					 '##...##',
+					 '...L...',
+					 '##...##',
+					 '#.#.#.#',
+					 '.##.##.' ]
 
 def get_occupied_seat( idx, row ):
 
@@ -244,6 +268,30 @@ def get_occupied_seat( idx, row ):
 
 	elif row[ idx ] == '.':
 		return None
+
+
+def raycast_for_seat( vector, row_num, rows, seat_num ):
+	row_width = len( rows[ 0 ] )
+	row_idx = row_num + vector[ 1 ]
+	seat_idx = seat_num + vector[ 0 ]
+	is_occupied = False
+
+	if row_idx < 0 or row_idx > len( rows ) - 1:
+		return 0
+
+	while 0 <= seat_idx < row_width:
+		if 0 > row_idx or row_idx >= len( rows ):
+			return 0
+
+		is_occupied = get_occupied_seat( seat_idx, rows[ row_idx ] )
+
+		if is_occupied == True:
+			return 1
+		elif is_occupied == False:
+			return 0
+
+		seat_idx += vector[ 0 ]
+		row_idx += vector[ 1 ]
 
 
 def check_adjacent_seats( row_num, rows, seat_num ):
@@ -273,7 +321,24 @@ def check_adjacent_seats( row_num, rows, seat_num ):
 	return occupied_seats
 
 
-def take_seats( data ):
+def check_visible_seats( row_num, rows, seat_num ):
+	occupied_seats = 0
+	is_occupied = False
+
+	search_vectors = [ ( -1, -1 ), ( 0, -1 ), ( 1, -1 ),
+							 ( -1, 0 ), ( 1, 0 ),
+							 ( -1, 1 ), ( 0, 1 ), ( 1, 1 ) ]
+
+	for vector in search_vectors:
+		is_occupied = raycast_for_seat( vector, row_num, rows, seat_num )
+
+		if is_occupied:
+			occupied_seats += 1
+
+	return occupied_seats
+
+
+def take_seats( data, adjacent = True ):
 	new_data = [ ]
 
 	for row_num, row in enumerate( data ):
@@ -285,13 +350,23 @@ def take_seats( data ):
 				pass
 
 			else:
-				occupied_seats = check_adjacent_seats( row_num, data, seat_num )
+				occupied_seats = 0
+				if adjacent:
+					occupied_seats = check_adjacent_seats( row_num, data, seat_num )
 
-				if occupied_seats == 0 and seat == 'L':
-					new_seats[ seat_num ] = '#'
+					if occupied_seats == 0 and seat == 'L':
+						new_seats[ seat_num ] = '#'
+					elif occupied_seats >= 4 and seat == '#':
+						new_seats[ seat_num ] = 'L'
 
-				elif occupied_seats >= 4 and seat == '#':
-					new_seats[ seat_num ] = 'L'
+				else:
+					occupied_seats = check_visible_seats( row_num, data, seat_num )
+
+					if occupied_seats == 0 and seat == 'L':
+						new_seats[ seat_num ] = '#'
+					elif occupied_seats >= 5 and seat == '#':
+						new_seats[ seat_num ] = 'L'
+
 
 			result = ''.join( [ str( seat ) for seat in new_seats ] )
 
@@ -299,28 +374,38 @@ def take_seats( data ):
 	return new_data
 
 
+def get_occupied_seats( data, adjacent = True ):
+	result = data
+	old_result = [ ]
+	i = 1
+
+	print( 'Pass #0')
+	for x in result:
+		print( '\t{0}'.format( x ) )
+	print( '' )
+
+	while result != old_result:
+		old_result = result.copy( )
+		result = take_seats( result, adjacent = adjacent )
+
+		# if old_result != result:
+			# print( 'Pass #{0}'.format( i ) )
+			# for x in result:
+				# print( '\t{0}'.format( x ) )
+			# print( '' )
+		# i += 1
+
+	n = sum( [ x.count( '#' ) for x in result ] )
+	print( 'Occupied seats: {0}'.format( n ) )
+
+
+
 if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_11_input.txt'
 	data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		data = [ line.strip( )for line in input_file.readlines( ) ]
+		data = [ line.strip( ) for line in input_file.readlines( ) ]
 
-	result = data
-	old_result = [ ]
-	i = 1
-
-	while result != old_result:
-		old_result = result.copy( )
-		result = take_seats( result )
-
-		# if old_result != result:
-			# print( 'Pass #{0}'.format( i ) )
-			# for x in result:
-				# print( x )
-			# print( '' )
-
-		i += 1
-
-	n = sum( [ x.count( '#' ) for x in result ] )
-	print( 'Occupied seats: {0}'.format( n ) )
+	# get_occupied_seats( test_data_1 )
+	get_occupied_seats( data, adjacent = False )
