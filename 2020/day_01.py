@@ -28,6 +28,7 @@ Of course, your expense report is much larger. Find the two entries that sum to 
 
 Your puzzle answer was 692916.
 
+
 --- Part Two ---
 
 The Elves in accounting are thankful for your help; one of them even offers you a starfish coin they had left over from a past vacation. They offer you a second one if you can find three numbers in your expense report that meet the same criteria.
@@ -49,9 +50,21 @@ def solution( answer, data, num_inputs = 1 ):
 	for num in itertools.combinations( data, num_inputs ):
 		if sum( num ) == answer:
 			values = ( [ data.index( val ) for val in num ] )
+
 			# Multiply list elements by each other, without functools
 			[ result.__setitem__( 0, data[ num ] * result.__getitem__( 0 ) ) for num in values ]
+
 			return result[ 0 ]
+
+
+def main( data ):
+	desired_sum = 2020
+
+	answer_1 = solution( desired_sum, data, num_inputs = 2 )
+	answer_2 = solution( desired_sum, data, num_inputs = 3 )
+
+	print( 'The answer to Question 1 is: {0}'.format( answer_1 ) )
+	print( 'The answer to Question 2 is: {0}'.format( answer_2 ) )
 
 
 
@@ -59,14 +72,9 @@ if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_01_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_01_input.txt'
 
-	answer = 2020
-	data = [ ]
+	raw_data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		data = [ int( num ) for num in input_file.read( ).split( ) ]
+		raw_data = [ int( num ) for num in input_file.read( ).split( ) ]
 
-	answer_1 = solution( answer, data, num_inputs = 2 )
-	answer_2 = solution( answer, data, num_inputs = 3 )
-
-	print( 'The answer to Question 1 is: {0}'.format( answer_1 ) )
-	print( 'The answer to Question 2 is: {0}'.format( answer_2 ) )
+	main( raw_data )
