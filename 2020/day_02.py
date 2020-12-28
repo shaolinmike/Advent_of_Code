@@ -44,22 +44,33 @@ Your puzzle answer was 711.
 Both parts of this puzzle are complete! They provide two gold stars: **
 '''
 
-def check_password_alpha( entry ):
-	valid_hits, crypto_key = get_password_policy( entry[ 0 ] )
-	password = entry[ 1 ].split( )[ 0 ]
-	hits = password.count( crypto_key )
+def get_password_policy( raw_data ):
+	data = raw_data.split( )
+	pwd_key = data[ 1 ]
+	pwd_rules = data[ 0 ].split( '-' )
 
-	if valid_hits[ 0 ] <= hits:
-		if hits <= valid_hits[ 1 ]:
-			return True
+	valid_range = tuple( map( int, pwd_rules ) )
+
+	return valid_range, pwd_key
+
+
+def check_password_rental( entry ):
+	password = entry[ 1 ]
+
+	valid_hits, pwd_key = get_password_policy( entry[ 0 ] )
+	hits = password.count( pwd_key )
+
+	if valid_hits[ 0 ] <= hits <= valid_hits[ 1 ]:
+		return True
 
 	return False
 
-def check_password_beta( entry ):
-	is_valid = False
 
-	valid_positions, crypto_key = get_password_policy( entry[ 0 ] )
-	password = entry[ 1 ].lstrip( ).split( )[ 0 ]
+def check_password_toboggan( entry ):
+	is_valid = False
+	password = entry[ 1 ]
+
+	valid_positions, pwd_key = get_password_policy( entry[ 0 ] )
 
 	for idx in valid_positions:
 		relative_idx = idx - 1
@@ -68,47 +79,41 @@ def check_password_beta( entry ):
 			is_valid = False
 
 		else:
-			if password[ relative_idx ] == crypto_key:
+			if password[ relative_idx ] == pwd_key:
 				is_valid = not is_valid
 
 	return is_valid
 
 
-def get_password_policy( entry ):
-	entry_bits = entry.split( )
-	key = entry_bits[ 1 ]
-
-	pwd_criteria = entry_bits[ 0 ].split( '-' )
-	valid_range = ( int( pwd_criteria[ 0 ] ), int( pwd_criteria[ 1 ] ) )
-
-	return ( valid_range, key )
-
-
-if __name__ == "__main__":
-	check_policy_one = False
+def main( data,  use_rental_policy = False ):
 	result = False
-
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_02_input.txt'
-	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_02_input.txt'
-
-	data = [ ]
-
-	with open( input, 'r' ) as input_file:
-		data = [ x.strip( ).split( ':' ) for x in input_file.readlines( ) ]
-
-	valid_passwords = [ ]
 	invalid_passwords = [ ]
+	valid_passwords = [ ]
 
 	for datum in data:
-		if check_policy_one:
-			result = check_password_alpha( datum )
+		if use_rental_policy:
+			result = check_password_rental( datum )
 		else:
-			result = check_password_beta( datum )
+			result = check_password_toboggan( datum )
 
 		if result:
 			valid_passwords.append( datum )
-
 		else:
 			invalid_passwords.append( datum )
 
-	print( 'Valid passwords:\t\t{0}\nInvalid passwords: \t{1}'.format( len( valid_passwords ), len( invalid_passwords ) ) )
+	print( '\tValid passwords:\t\t{0}*\n\tInvalid passwords: \t{1}\n'.format( len( valid_passwords ), len( invalid_passwords ) ) )
+
+
+
+if __name__ == "__main__":
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_02_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_02_input.txt'
+
+	with open( input, 'r' ) as input_file:
+		raw_data = [ x.strip( ).split( ': ' ) for x in input_file.readlines( ) ]
+
+	print( 'Part One:' )
+	main( raw_data, use_rental_policy = True )
+
+	print( 'Part Two:' )
+	main( raw_data )
