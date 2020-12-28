@@ -85,38 +85,53 @@ MOVE_PATTERN_TWO_TURBO = ( 7, 1 )
 MOVE_PATTERN_TWO_TURBO_HYPER = ( 1, 2 )
 
 
-def get_new_position( x, y, row_width, move_pattern ):
+def get_new_position( x, y, move_pattern ):
 	new_x = move_pattern[ 0 ] + x
 	new_y = move_pattern[ 1 ] + y
 
-	if new_x >= row_width:
-		new_x -= data_width
+	if new_x >= DATA_WIDTH:
+		new_x -= DATA_WIDTH
 
 	return new_x, new_y
 
 
-def check_for_trees( move_pattern, debug = False ):
+def check_for_trees( data, move_pattern ):
 	current_x = 0
-	current_y = 0
 	encountered_trees = 0
 
-	for y in range( 0, data_height, move_pattern[ 1 ] ):
-		if y < data_height:
-			new_x, new_y = get_new_position( current_x, y, data_width, move_pattern )
+	for y in range( 0, DATA_HEIGHT, move_pattern[ 1 ] ):
+		if y < DATA_HEIGHT:
+			new_x, new_y = get_new_position( current_x, y, move_pattern )
 
-			if new_y <= data_height:
+			if new_y <= DATA_HEIGHT:
 				if data[ new_y ][ new_x ] == '#':
-					if debug:
+					encountered_trees += 1
+
+					if DEBUG:
 						result_output = list( data[ new_y ] )
 						result_output[ new_x ] = 'X'
 						result_output = "".join( result_output )
 						print( '[ {0} ] : {1}'.format( new_y, result_output ) )
-					encountered_trees += 1
 
 			current_x = new_x
 
-	print( 'Number of trees hit: {0}'.format( encountered_trees ) )
+	if DEBUG:
+		print( 'Number of trees hit: {0}'.format( encountered_trees ) )
+
 	return encountered_trees
+
+
+def main( data ):
+	trees_1 = check_for_trees( data, MOVE_PATTERN_ALPHA )
+	trees_2 = check_for_trees( data, MOVE_PATTERN_ONE )
+	trees_3 = check_for_trees( data, MOVE_PATTERN_TWO )
+	trees_4 = check_for_trees( data, MOVE_PATTERN_TWO_TURBO )
+	trees_5 = check_for_trees( data, MOVE_PATTERN_TWO_TURBO_HYPER )
+
+	result_2 = trees_1 * trees_2 * trees_3 * trees_4 * trees_5
+
+	print( '\nRun 1:\n\tTrees encountered: {0}'.format( trees_1 ) )
+	print( '\nRun 2:\n\tTrees encountered: {0}'.format( result_2 ) )
 
 
 
@@ -124,19 +139,13 @@ if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_03_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_03_input.txt'
 
-	data = [ ]
+	raw_data = [ ]
+	DEBUG = False
 
 	with open( input, 'r' ) as input_file:
-		data = [ line.strip( ) for line in input_file.readlines( ) ]
+		raw_data = [ line.strip( ) for line in input_file.readlines( ) ]
 
-	data_width = len( data[ 0 ] )
-	data_height = len( data ) - 1
+	DATA_WIDTH = len( raw_data[ 0 ] )
+	DATA_HEIGHT = len( raw_data ) - 1
 
-	trees_1 = check_for_trees( MOVE_PATTERN_ALPHA, debug = False )
-	trees_2 = check_for_trees( MOVE_PATTERN_ONE, debug = False )
-	trees_3 = check_for_trees( MOVE_PATTERN_TWO, debug = False )
-	trees_4 = check_for_trees( MOVE_PATTERN_TWO_TURBO, debug = False )
-	trees_5 = check_for_trees( MOVE_PATTERN_TWO_TURBO_HYPER, debug = False )
-
-	result = trees_1 * trees_2 * trees_3 * trees_4 * trees_5
-	print( 'Total Trees: {0}'.format( result ) )
+	main( raw_data )
