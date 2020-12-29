@@ -89,47 +89,28 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 
 '''
 
-test_data_1 = [ 'abcx', 'abcy', 'abcz' ]
-test_data_2 = [ 'abc', '', 'a', 'b', 'c', '', 'ab', 'ac', '', 'a', 'a', 'a', 'a', '', 'b' ]
+test_data_1 = [ 'abc', 'a\nb\nc', 'ab\nac', 'a\na\na\na', 'b' ]
 
-def criteria_one( data ):
-	answers = [ ]
+def customs_parser( raw_data, part_one = False ):
+	data = [ x.strip( ).split( '\n' ) for x in raw_data ]
+
 	total_answers = [ ]
 	yes_answers = 0
 
-	for _, line in enumerate( data ):
-		if line != '':
-			answers = answers + list( line )
-
-		if line == '' or line == data[ -1 ]:
-			unique_answers = sorted( set( answers ) )
+	for idx, answers in enumerate( data ):
+		if part_one:
+			unique_answers = { x for answer in answers for x in answer }
 			total_answers.append( unique_answers )
-			answers = [ ]
+
+		else:
+			shared_answers = set.intersection( *[ { x for x in answer } for answer in answers ] )
+			total_answers.append( shared_answers )
 
 	for idx, answer_group in enumerate( total_answers ):
 		yes_answers += len( answer_group )
-		print( '\tNumber of "YES" answers in this group: {0}'.format( len( answer_group ) ) )
 
-	return yes_answers
-
-
-def criteria_two( data ):
-	answers = [ ]
-	total_answers = [ ]
-	yes_answers = 0
-
-	for idx, line in enumerate( data ):
-		if line != '':
-			answers.append( set( list( line ) ) )
-
-		if line == '' or idx == len( data ) - 1:
-			shared_answers = set.intersection( *answers )
-			total_answers.append( len( shared_answers ) )
-			answers = [ ]
-
-	for idx, answer_group in enumerate( total_answers ):
-		yes_answers += answer_group
-		print( '\tNumber of "YES" answers in this group: {0}'.format( answer_group ) )
+		if DEBUG:
+			print( '\tNumber of "YES" answers in this group: {0}'.format( len( answer_group ) ) )
 
 	return yes_answers
 
@@ -139,14 +120,14 @@ if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_06_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_06_input.txt'
 
-	data = [ ]
-	yes_answers = 0
+	raw_data = [ ]
+	DEBUG = False
 
 	with open( input, 'r' ) as input_file:
-		data = [ line.strip( ) for line in input_file.readlines( ) ]
+		raw_data = input_file.read( ).split( '\n\n' )
 
-	yes_answers = criteria_one( data )
-	shared_answers = criteria_two( data )
+	yes_answers = customs_parser( raw_data, part_one = True )
+	shared_answers = customs_parser( raw_data )
 
 	print( '\nNumber of questions answered "YES" to: {0}'.format( yes_answers ) )
 	print( '\nNumber of questions all answered "YES" to: {0}'.format( shared_answers ) )
