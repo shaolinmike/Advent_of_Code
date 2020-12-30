@@ -107,16 +107,7 @@ def check_for_trees( data, move_pattern ):
 				if data[ new_y ][ new_x ] == '#':
 					encountered_trees += 1
 
-					if DEBUG:
-						result_output = list( data[ new_y ] )
-						result_output[ new_x ] = 'X'
-						result_output = "".join( result_output )
-						print( '[ {0} ] : {1}'.format( new_y, result_output ) )
-
 			current_x = new_x
-
-	if DEBUG:
-		print( 'Number of trees hit: {0}'.format( encountered_trees ) )
 
 	return encountered_trees
 
@@ -140,7 +131,6 @@ if __name__ == "__main__":
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_03_input.txt'
 
 	raw_data = [ ]
-	DEBUG = False
 
 	with open( input, 'r' ) as input_file:
 		raw_data = [ line.strip( ) for line in input_file.readlines( ) ]
