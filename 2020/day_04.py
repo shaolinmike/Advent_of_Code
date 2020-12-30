@@ -125,46 +125,20 @@ Both parts of this puzzle are complete! They provide two gold stars: **'''
 import ast
 
 
-test_data = [ 'ecl:gry pid:860033327 eyr:2020 hcl:#fffffd\n',
-				  'byr:1937 iyr:2017 cid:147 hgt:183cm\n',
-				  '\n',
-				  'iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884\n',
-				  'hcl:#cfa07d byr:1929\n',
-				  '\n',
-				  'hcl:#ae17e1 iyr:2013\n',
-				  'eyr:2024\n',
-				  'ecl:brn pid:760753108 byr:1931\n',
-				  'hgt:179cm\n',
-				  '\n',
-				  'hcl:#cfa07d eyr:2025 pid:166559648\n',
-				  'iyr:2011 ecl:brn hgt:59in\n' ]
+test_data = [ 'ecl:gry pid:860033327 eyr:2020 hcl:#fffffd byr:1937 iyr:2017 cid:147 hgt:183cm',
+				  'iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884 hcl:#cfa07d byr:1929',
+				  'hcl:#ae17e1 iyr:2013 eyr:2024 ecl:brn pid:760753108 byr:1931 hgt:179cm',
+				  'hcl:#cfa07d eyr:2025 pid:166559648 iyr:2011 ecl:brn hgt:59in' ]
 
-test_data2 = [ 'eyr:1972 cid:100\n',
-					'hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926\n',
-					'\n',
-					'iyr:2019\n',
-					'hcl:#602927 eyr:1967 hgt:170cm\n',
-					'ecl:grn pid:012533040 byr:1946\n',
-					'\n',
-					'hcl:dab227 iyr:2012\n',
-					'ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277\n',
-					'\n',
-					'hgt:59cm ecl:zzz\n',
-					'eyr:2038 hcl:74454a iyr:2023\n',
-					'pid:3556412378 byr:2007\n' ]
+test_data_2 = [ 'eyr:1972 cid:100 hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926',
+					'iyr:2019 hcl:#602927 eyr:1967 hgt:170cm ecl:grn pid:012533040 byr:1946',
+					'hcl:dab227 iyr:2012 ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277',
+					'hgt:59cm ecl:zzz eyr:2038 hcl:74454a iyr:2023 pid:3556412378 byr:2007' ]
 
-test_data3 = [ 'pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980\n',
-					'hcl:#623a2f\n',
-					'\n',
-					'eyr:2029 ecl:blu cid:129 byr:1989\n',
-					'iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm\n',
-					'\n',
-					'hcl:#888785\n',
-					'hgt:164cm byr:2001 iyr:2015 cid:88\n',
-					'pid:545766238 ecl:hzl\n',
-					'eyr:2022\n',
-					'\n',
-					'iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719\n' ]
+test_data_3 = [ 'pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980 hcl:#623a2f',
+					'eyr:2029 ecl:blu cid:129 byr:1989 iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm',
+					'hcl:#888785 hgt:164cm byr:2001 iyr:2015 cid:88 pid:545766238 ecl:hzl eyr:2022',
+					'iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719' ]
 
 BYR = 'byr'
 IYR = 'iyr'
@@ -178,26 +152,9 @@ CID = 'cid'
 passport_fields = [ BYR, IYR, EYR, HGT, HCL, ECL, PID, CID ]
 
 
-class Passport_Entry( ):
-	def __init__( self, byr, iyr, eyr, hgt, hcl, ecl, pid, cid = None ):
-		self.byr = byr
-		self.iyr = iyr
-		self.eyr = eyr
-		self.hgt = hgt
-		self.hcl = hcl
-		self.ecl = ecl
-		self.pid = pid
-		self.cid = cid
-
-	def __repr__( self ):
-		return repr( 'Passport_Entry( ): byr: {0}  iyr: {1}  eyr: {2}  hgt: {3}  hcl: {4}  ecl: {5}  pid: {6}  cid: {7}'.format(
-			self.byr, self.iyr, self.eyr, self.hgt, self.hcl, self.ecl, self.pid, self.cid ) )
-
-
 def verify_data( passport_entry, expanded_check = True ):
 	result = True
 	missing_fields = [ ]
-	invalid_fields = [ ]
 
 	for field in passport_fields:
 		if field not in passport_entry.keys( ):
@@ -208,108 +165,78 @@ def verify_data( passport_entry, expanded_check = True ):
 
 		if expanded_check and field not in missing_fields:
 			if field == BYR:
-				if int( passport_entry[ BYR ] ) not in range( 1920, 2003 ):
-					result = False
-					invalid_fields.append( BYR )
+				result = result and int( passport_entry[ BYR ] ) in range( 1920, 2003 )
 
 			if field == IYR:
-				if int( passport_entry[ IYR ] ) not in range( 2010, 2021 ):
-					result = False
-					invalid_fields.append( IYR )
+				result = result and int( passport_entry[ IYR ] ) in range( 2010, 2021 )
 
 			if field == EYR:
-				if int( passport_entry[ EYR ] ) not in range( 2020, 2031 ):
-					result = False
-					invalid_fields.append( EYR )
+				result = result and int( passport_entry[ EYR ] ) in range( 2020, 2031 )
 
 			if field == HGT:
 				height = passport_entry[ HGT ]
 				height_val = 0
 				if 'cm' in height:
 					height_val = int( height.split( 'cm' )[ 0 ] )
-					if int( height_val ) not in range( 150, 194 ):
-						result = False
-						invalid_fields.append( HGT )
+					result = result and int( height_val ) in range( 150, 194 )
 
 				elif 'in' in height:
 					height_val = int( height.split( 'in' )[ 0 ] )
-					if int( height_val ) not in range( 59, 77 ):
-						result = False
-						invalid_fields.append( HGT )
+					result = result and int( height_val ) in range( 59, 77 )
 
 				else:
 					result = False
-					invalid_fields.append( HGT )
 
 			if field == HCL:
-				hair_col = passport_entry[ HCL ].split( '#' )
-
-				if len( hair_col ) == 2:
-					hair_val = hair_col[ 1 ]
-					if len( hair_val ) == 6:
-						if int( hair_val, 16 ):
-							pass
-				else:
+				if passport_entry[ HCL ][ 0 ] != '#':
 					result = False
-					invalid_fields.append( HCL )
+
+				else:
+					hair_col = passport_entry[ HCL ].replace( '#', '' )
+
+					if len( hair_col ) != 6:
+						result = False
+					elif len( hair_col ) == 6:
+						result = result and int( hair_col, 16 )
 
 			if field == ECL:
 				eye_colors = [ 'amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth' ]
-				if passport_entry[ ECL ] not in eye_colors:
-					result = False
-					invalid_fields.append( ECL )
+				result = result and passport_entry[ ECL ] in eye_colors
 
 			if field == PID:
 				pid = passport_entry[ PID ]
-				if len( pid ) != 9 or type( int( pid ) ) != int:
+				if len( pid ) == 9:
+					result = result and type( int( pid ) ) == int
+				else:
 					result = False
-					invalid_fields.append( PID )
 
-	return result, missing_fields, invalid_fields
-
+	return result
 
 
-if __name__ == "__main__":
-	# input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_04_input.txt'
-	input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_04_input.txt'
-
-	passport_db = [ ]
+def main( data, expanded_check = True ):
 	data_dict = { }
+	valid_entries = 0
 
-	with open( input, 'r' ) as input_file:
-		data = input_file.read( ).split( '\n\n' )
-
-	expanded_check = True
-	# data = test_data
 	for line_num, line in enumerate( data ):
-		# print( line_num )
-		# print( "{'" + line.replace( '\n', ' ' ).replace( ' ', "', '" ).replace( ":", "' : '" ).strip( ) + "'}" )
 		new_attributes = ast.literal_eval( "{'" + line.strip( ).replace( '\n', ' ' ).replace( ' ', "', '" ).replace( ":", "' : '" ) + "'}" )
 		data_dict.update( new_attributes )
 
-		cid = 'None'
-		if 'cid' in data_dict.keys( ):
-			cid = data_dict[ 'cid' ]
-
-		result, missing_fields, invalid_fields = verify_data( data_dict, expanded_check = expanded_check )
+		result = verify_data( data_dict, expanded_check = expanded_check )
 
 		if result:
-			new_entry = Passport_Entry( data_dict[ 'byr' ],
-		                               data_dict[ 'iyr' ],
-		                               data_dict[ 'eyr' ],
-		                               data_dict[ 'hgt' ],
-		                               data_dict[ 'hcl' ],
-		                               data_dict[ 'ecl' ],
-		                               data_dict[ 'pid' ],
-		                               cid = cid )
-			passport_db.append( new_entry )
-
-		else:
-			if expanded_check:
-				print( '[ {0} ] Missing fields: {1}\t\tInvalid Fields: {2}'.format( line_num + 1, missing_fields, invalid_fields ) )
-			else:
-				print( '[ {0} ] Missing fields: {1}'.format( line_num + 1, missing_fields ) )
+			valid_entries += 1
 
 		data_dict = { }
 
-	print( "\nValid number of entries: {0}".format( len( passport_db ) ) )
+	print( "\nValid number of entries: {0}".format( valid_entries ) )
+
+
+if __name__ == "__main__":
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_04_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_04_input.txt'
+
+	with open( input, 'r' ) as input_file:
+		raw_data = input_file.read( ).split( '\n\n' )
+
+	main( raw_data, expanded_check = False )
+	main( raw_data )
