@@ -61,8 +61,9 @@ Looks like you only needed 49 stars after all.
 You don't have enough stars to pay the deposit, though. You need 15 more.
 
 '''
-from operator import pow
-import math
+
+test_data_1 = [ '5764801', '17807724' ]
+
 
 class RFID_object( ):
 
@@ -70,10 +71,6 @@ class RFID_object( ):
 		self.loop_size = 0
 		self.public_key = int( public_key )
 		self.subject_number = 7
-
-
-	def __repr__( self ):
-		return 'RFID_Object( )'
 
 
 	def generate_loop_size( self ):
@@ -91,7 +88,7 @@ class RFID_object( ):
 	def get_encryption_key( self, other_loop_size ):
 		val = 1
 
-		for i in range( 0, other_loop_size ):
+		for n in range( 0, other_loop_size ):
 			val = val * self.public_key
 			val = val % 20201227
 
@@ -108,12 +105,10 @@ def parse_data( raw_data ):
 	card.generate_loop_size( )
 	door.generate_loop_size( )
 
-	# print( 'Encryption key (card): {}'.format( card.get_encryption_key( door.loop_size ) ) )
 	print( 'Encryption key (door): {}'.format( door.get_encryption_key( card.loop_size ) ) )
 
 
-test_data_1 = [ '5764801', '17807724' ]
-DEBUG = True
+
 if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_25_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_25_input.txt'
@@ -121,4 +116,4 @@ if __name__ == "__main__":
 	with open( input, 'r' ) as input_file:
 		raw_data = input_file.read( ).strip( ).split( '\n' )
 
-	result = parse_data( raw_data )
+	parse_data( raw_data )
