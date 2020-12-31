@@ -92,11 +92,6 @@ Your puzzle answer was 969.
 Both parts of this puzzle are complete! They provide two gold stars: **
 '''
 
-ACCUMULATOR = 0
-INST_COUNT_ACC = 0
-INST_COUNT_JMP = 0
-INST_COUNT_NOP = 0
-
 test_data = [ ( 'nop', '+0' ),
 				  ( 'acc', '+1' ),
 				  ( 'jmp', '+4' ),
@@ -108,31 +103,10 @@ test_data = [ ( 'nop', '+0' ),
 				  ( 'acc', '+6' ) ]
 
 
-def acc( val ):
-	global ACCUMULATOR
-	global INST_COUNT_ACC
-
-	INST_COUNT_ACC += 1
-	ACCUMULATOR += val
-
-
-def jmp( line_num, val ):
-	global INST_COUNT_JMP
-
-	INST_COUNT_JMP += 1
-	line_num += val
-
-	return line_num
-
-
-def nop( ):
-	global INST_COUNT_NOP
-	INST_COUNT_NOP += 1
-
-
 def patch_code( instruction ):
 	if 'jmp' in instruction:
 		instruction = ( 'nop', instruction[ 1 ] )
+
 	elif 'nop' in instruction:
 		instruction = ( 'jmp', instruction[ 1 ] )
 
@@ -148,17 +122,17 @@ def code_patcher( data ):
 
 		fix_line = fix[ 0 ]
 		instruction = patch_code( fix[ 1 ] )
-		# instruction = patch_data[ instruction_num - 1 ]
-		patch_data[ fix_line ] = instruction
 
-		line_num = run( patch_data )
+		patch_data[ fix_line ] = instruction
+		line_num, count_acc = run_code( patch_data )
+
 		if line_num >= len( data ):
+			print( 'Patch on line: {0}'.format( line_num ) )
+			print( 'Patch Accumulator : {}'.format( count_acc ) )
 			return fix_line
 
 
-def run( data ):
-	global ACCUMULATOR
-	ACCUMULATOR = 0
+def run_code( data ):
 	count_acc = 0
 	count_jmp = 0
 	count_nop = 0
@@ -168,32 +142,34 @@ def run( data ):
 	line_num = 0
 
 	while line_num < data_size:
-		curr_instruction = line_num + 1
 		if line_num not in instructions:
 			instructions.append( line_num )
 		else:
-			print( '\t\t>>>> EOL' )
-			return line_num
+			return line_num, count_acc
 
 		cmd = data[ line_num ][ 0 ]
 		val = int( data[ line_num ][ 1 ] )
 
 		if cmd == 'acc':
-			count_acc += 1
+			count_acc += val
 			line_num += 1
-			acc( val )
 
 		elif cmd == 'jmp':
 			count_jmp += 1
-			line_num = jmp( line_num, val )
+			line_num += val
 
 		elif cmd == 'nop':
 			count_nop += 1
 			line_num += 1
-			nop( )
-		# print( '[ {0} ]\tACC: {1}\tJMP: {2}\tNOP: {3}'.format( curr_instruction, INST_COUNT_ACC, INST_COUNT_JMP, INST_COUNT_NOP ) )
 
-	return line_num
+	return line_num, count_acc
+
+
+def main( data ):
+	line_num, count_acc = run_code( data )
+	print( 'Accumulator: {0}'.format( count_acc ) )
+	print( 'Exit on line: {0}\n'.format( line_num ) )
+	code_patcher( data )
 
 
 
@@ -201,18 +177,9 @@ if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_08_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_08_input.txt'
 
-	data = [ ]
-	line_num = 0
+	raw_data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		instruction = [ tuple( line.strip( ).split(  ) ) for line in input_file.readlines( ) ]
-		data += instruction
+		raw_data = [ tuple( line.strip( ).split(  ) ) for line in input_file.readlines( ) ]
 
-	line_num = run( data )
-	line_num_patch = code_patcher( data )
-
-	print( '\nAccumulator: {0}'.format( ACCUMULATOR ) )
-	print( 'Exit on line: {0}'.format( line_num ) )
-
-	print( 'Patch on line: {0}'.format( line_num_patch ) )
-
+	main( raw_data )
