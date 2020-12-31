@@ -77,22 +77,7 @@ def build_seats( rows, seats ):
 	return row_array, seat_array
 
 
-def validate_boarding_pass( boarding_pass ):
-	row = boarding_pass[ :7 ]
-	seat = boarding_pass[ 7: ]
-
-	for idx, val in enumerate( row ):
-		if val not in 'FB':
-			return False
-
-	for idx, val in enumerate( seat ):
-		if val not in 'LR':
-			return False
-
-	return True, row, seat
-
-
-def lookup_seat( lookup_val, boarding_pass, seating_section, debug = False ):
+def lookup_seat( lookup_val, boarding_pass, seating_section ):
 	idx_high = len( seating_section )
 	idx_low = 0
 	idx_mid = 0
@@ -101,13 +86,9 @@ def lookup_seat( lookup_val, boarding_pass, seating_section, debug = False ):
 		if step  == lookup_val[ 0 ]:
 			idx_mid = bisect.bisect_left( seating_section, seating_section[ int( ( idx_high + idx_low ) / 2 ) ], lo = idx_low, hi = idx_high )
 			idx_high = idx_mid
-			if debug:
-				print( '[ {0} ] {1} : {2} : {3}'.format( step, idx_low, idx_mid, idx_high ) )
 		elif step == lookup_val[ 1 ]:
 			idx_mid = bisect.bisect_left(  seating_section, seating_section[ int( ( idx_high + idx_low ) / 2 ) ], lo = idx_low, hi = idx_high )
 			idx_low = idx_mid
-			if debug:
-				print( '[ {0} ] {1} : {2} : {3}'.format( step, idx_low, idx_mid, idx_high ) )
 
 	return idx_low
 
@@ -115,10 +96,12 @@ def lookup_seat( lookup_val, boarding_pass, seating_section, debug = False ):
 def find_seat( boarding_pass, rows, seats ):
 	row_num = 0
 	seat_num = 0
-	result, row_pass, seat_pass = validate_boarding_pass( boarding_pass )
+
+	row_pass = boarding_pass[ :7 ]
+	seat_pass = boarding_pass[ 7: ]
 
 	row_num = lookup_seat( 'FB', row_pass, rows )
-	seat_num = lookup_seat( 'LR', seat_pass, seats )#, debug = True )
+	seat_num = lookup_seat( 'LR', seat_pass, seats )
 
 	seat = row_num * 8 + seat_num
 
@@ -132,7 +115,23 @@ def find_my_seat( assigned_seats ):
 	lowest_seat_num = sorted( assigned_seats )[ 0 ]
 	my_seat = [ seat for seat in total_seats[ lowest_seat_num: ] if seat not in assigned_seats ][ 0 ]
 
-	return my_seat
+	print( 'My seat number: {0}'.format( my_seat ) )
+
+
+def main( data ):
+	row = [ ]
+	seat = [ ]
+	assigned_seats = [ ]
+
+	row, seat = build_seats( 128, 8 )
+
+	for boarding_pass in data:
+		assigned_seat = find_seat( boarding_pass, row, seat )
+		assigned_seats.append( assigned_seat )
+
+	print( 'Highest assigned seat number: {0}'.format( sorted( assigned_seats )[ -1 ] ) )
+
+	find_my_seat( assigned_seats )
 
 
 
@@ -140,32 +139,9 @@ if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_05_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_05_input.txt'
 
-	data = [ ]
-	row = [ ]
-	seat = [ ]
-
-	valid_passes = [ ]
-	invalid_passes = [ ]
-	assigned_seats = [ ]
+	raw_data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		data = [ line.strip( ) for line in input_file.readlines( ) ]
+		raw_data = [ line.strip( ) for line in input_file.readlines( ) ]
 
-	for boarding_pass in data:
-		result = validate_boarding_pass( boarding_pass )
-		row, seat = build_seats( 128, 8 )
-		assigned_seat = find_seat( boarding_pass, row, seat )
-
-		if result:
-			valid_passes.append( boarding_pass )
-		else:
-			invalid_passes.append( boarding_pass )
-
-		assigned_seats.append( assigned_seat )
-
-	my_seat = find_my_seat( assigned_seats )
-
-	print( 'Highest assigned seat number: {0}'.format( sorted( assigned_seats )[ -1 ] ) )
-	print( 'My seat number: {0}'.format( my_seat ) )
-	print( "\nValid number of entries: {0}\t\t\nInvalid number of entries: {1}".format( len( valid_passes), len( invalid_passes ) ) )
-
+	main( raw_data )
