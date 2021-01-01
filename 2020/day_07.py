@@ -117,22 +117,6 @@ def can_contain_color( bags, color ):
 	return count, valid_bags
 
 
-def find_all_bags( data, color ):
-	total_bags = 0
-	total_bag_colors = [ ]
-
-	num_bags, bag_colors = can_contain_color( data, color )
-	total_bag_colors = total_bag_colors = bag_colors
-
-	sub_total_bags = 0
-	for bag in bag_colors:
-		sub_total_bags, bag_colors = can_contain_color( data, bag.name )
-		total_bags += sub_total_bags
-		total_bag_colors += bag_colors
-
-	return list( set( total_bag_colors ) )
-
-
 def find_num_bags( all_bags, bag_color ):
 	total_bags = 0
 	my_bag = [ bag for bag in all_bags if bag.name == bag_color ][ 0 ]
@@ -151,6 +135,22 @@ def find_num_bags( all_bags, bag_color ):
 			return num
 
 	return total_bags
+
+
+def find_all_bags( data, color ):
+	total_bags = 0
+	total_bag_colors = [ ]
+
+	num_bags, bag_colors = can_contain_color( data, color )
+	total_bag_colors = total_bag_colors = bag_colors
+
+	sub_total_bags = 0
+	for bag in bag_colors:
+		sub_total_bags, bag_colors = can_contain_color( data, bag.name )
+		total_bags += sub_total_bags
+		total_bag_colors += bag_colors
+
+	return list( set( total_bag_colors ) )
 
 
 def get_contents( data ):
@@ -172,7 +172,6 @@ def get_contents( data ):
 def parse_data( data ):
 	all_bags = [ ]
 	bag = ''
-	contents = ''
 
 	for line in data:
 		bag = Bag( line[ 0 ] )
@@ -186,20 +185,25 @@ def parse_data( data ):
 	return all_bags
 
 
+def main( data ):
+	desired_bag_color = 'shiny gold'
+
+	all_bags = parse_data( data )
+	num_bag_colors = find_all_bags( all_bags, desired_bag_color )
+	num_bags = find_num_bags( all_bags, desired_bag_color )
+
+	print( '\nNumber of bags that can contain a {0} bag: {1}'.format( desired_bag_color, len( num_bag_colors ) ) )
+	print( '\nNumber of bags inside a {0} bag: {1}'.format( desired_bag_color, num_bags ) )
+
+
+
 if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_07_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_07_input.txt'
 
-	data = [ ]
+	raw_data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		data = [ line.strip( ).split( ' bags contain ' ) for line in input_file.readlines( ) ]
+		raw_data = [ line.strip( ).split( ' bags contain ' ) for line in input_file.readlines( ) ]
 
-	all_bags = parse_data( data )
-
-	bag_color = 'shiny gold'
-	num_bag_colors = find_all_bags( all_bags, bag_color )
-	num_bags = find_num_bags( all_bags, bag_color )
-
-	print( '\nNumber of bags that can contain a {0} bag: {1}'.format( bag_color, len( num_bag_colors ) ) )
-	print( '\nNumber of bags inside a {0} bag: {1}'.format( bag_color, num_bags ) )
+	main( raw_data )
