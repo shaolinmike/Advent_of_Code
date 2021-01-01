@@ -54,42 +54,38 @@ Impressed, the Elves issue you a challenge: determine the 30000000th number spok
 
 Given your starting numbers, what will be the 30000000th number spoken?
 
+Your puzzle answer was 164878.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
 
 '''
 
-from collections import  deque
-
-def check_words( t, spoken, word ):
-	if word in spoken:
-		spoken[ word ].append( t )
-	else:
-		spoken[ word ] = deque( [ t ], 2 )
+from collections import defaultdict, deque
+from functools import partial
 
 
-def play_game( data_input, limit):
-	spoken = { }
+def play_game( data_input, nth_word ):
 	last_word = 0
+	spoken = defaultdict( partial( deque, maxlen = 2 ) )
 
-	for t in range( 1, limit + 1 ):
+	for t in range( 1, nth_word + 1 ):
 		# Starting numbers
 		if t in range( len( data_input ) + 1 ):
 			word = data_input[ t - 1 ]
-			check_words( t, spoken, word )
 
 		# Last work spoken before
 		elif len( spoken[ last_word ] ) == 1:
 			word = 0
-			check_words( t, spoken, word )
 
 		# Spoken before, multiple times
 		elif len( spoken[ last_word ] ) > 1:
 			word = spoken[ last_word ][ 1 ] - spoken[ last_word ][ 0 ]
-			check_words( t, spoken, word )
 
+		spoken[ word ].append( t )
 		last_word = word
-		# print( '[ {0} ] {1}'.format( t, word ) )
 
-	return last_word
+	print( '\nThe {0}th number is: {1}'.format( nth_word, last_word ) )
+
 
 
 if __name__ == "__main__":
@@ -101,12 +97,11 @@ if __name__ == "__main__":
 	test_data_6 = [ 3, 2, 1 ]
 	test_data_7 = [ 3, 1, 2 ]
 
-	# data = [ 8, 0, 17, 4, 1, 12 ]
-	data = [ 18, 8, 0, 5, 4, 1, 20 ]
+	data = [ 8, 0, 17, 4, 1, 12 ]
+	# data = [ 18, 8, 0, 5, 4, 1, 20 ]
 
-	data_input = data
+	n = 2020
+	n2 = 30000000
 
-	n = 30000000
-	# n = 2020
-	spoken_word = play_game( data_input, n )
-	print( '\nThe {0}th number is: {1}'.format( n, spoken_word ) )
+	play_game ( data, n )
+	play_game ( data, n2 )
