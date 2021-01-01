@@ -59,26 +59,26 @@ The final step in breaking the XMAS encryption relies on the invalid number you 
 
 Again consider the above example:
 
-35
-20
-15
-25
-47
-40
-62
-55
-65
-95
-102
-117
-150
-182
-127
-219
-299
-277
-309
-576
+	35
+	20
+	15
+	25
+	47
+	40
+	62
+	55
+	65
+	95
+	102
+	117
+	150
+	182
+	127
+	219
+	299
+	277
+	309
+	576
 
 In this list, adding up all of the numbers from 15 through 40 produces the invalid number from step 1, 127. (Of course, the contiguous set of numbers in your actual list might be much longer.)
 
@@ -92,18 +92,38 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 
 '''
 
+from collections import deque
+
 test_data = [ 35, 20, 15, 25, 47, 40, 62, 55, 65, 95, 102, 117, 150, 182, 127, 219, 299, 277, 309, 576 ]
 
 
 def bad_num_search( data, preamble_size, start_idx, desired_val ):
 	preamble_list = data[ start_idx:preamble_size ]
-
 	for num in preamble_list:
-		search_val = desired_val - num
-		if search_val in preamble_list:
+		if desired_val - num in preamble_list:
 			return True
 
 	return False
+
+
+def find_encryption_set( data, desired_val ):
+	val = deque( )
+
+	for idx, item in enumerate( data ):
+		if sum( val ) < desired_val:
+			val.append( item )
+
+		elif sum( val ) > desired_val:
+			val.popleft( )
+			val.append( item )
+			while sum( val ) > desired_val:
+				val.popleft( )
+
+		elif sum( val ) == desired_val:
+			encryption_weakness = min( val ) + max( val )
+			return encryption_weakness
+
+	return -1
 
 
 def find_bad_number( data, preamble_size ):
@@ -111,7 +131,6 @@ def find_bad_number( data, preamble_size ):
 	start_idx = 0
 
 	for number in data[ preamble_size: ]:
-		# print( 'Number {0}'.format( number ) )
 		if not bad_num_search( data, preamble_size, start_idx, number ):
 			bad_number = number
 			break
@@ -122,49 +141,26 @@ def find_bad_number( data, preamble_size ):
 	return bad_number
 
 
-def find_encryption_set( data, desired_val ):
-	val = [ ]
-
-	for idx, item in enumerate( data ):
-		if sum( val ) < desired_val:
-			# print( 'Too low: {0}'.format( sum( val ) ) )
-			val.append( item )
-
-		elif sum( val ) > desired_val:
-			# print( 'Too high: {0}'.format( sum( val ) ) )
-
-			val.pop( 0 )
-			val.append( item )
-			while sum( val ) > desired_val:
-				val.pop( 0 )
-
-		elif sum( val ) == desired_val:
-			encryption_weakness = min( val ) + max( val )
-			return encryption_weakness
-
-	return 0
-
-
-
-if __name__ == "__main__":
-	DEBUG = False
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_09_input.txt'
-	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_09_input.txt'
-
-	data = [ ]
+def main( data ):
 	bad_number = 0
 	encryption_weakness = 0
 	preamble_size = 25
-
-	with open( input, 'r' ) as input_file:
-		data = [ int( line.strip( ) ) for line in input_file.readlines( ) ]
-
-	if DEBUG:
-		data = test_data
-		preamble_size = 5
 
 	bad_number = find_bad_number( data, preamble_size )
 	encryption_weakness = find_encryption_set( data, bad_number )
 
 	print( '\nThe bad number is: {0}'.format( bad_number ) )
 	print( '\nThe encryption weakness is: {0}'.format( encryption_weakness ) )
+
+
+
+if __name__ == "__main__":
+	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_09_input.txt'
+	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_09_input.txt'
+
+	raw_data = [ ]
+
+	with open( input, 'r' ) as input_file:
+		raw_data = [ int( line.strip( ) ) for line in input_file.readlines( ) ]
+
+	main( raw_data )
