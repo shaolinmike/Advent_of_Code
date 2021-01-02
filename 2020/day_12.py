@@ -81,22 +81,27 @@ test_data_1 = [ 'F10', 'N3', 'F7', 'R90', 'F11' ]
 
 
 
-class boat( ):
+class Boat_Ferry( ):
 
-	def __init__( self, x = 0, y = 0, bearing = 0 ):
+	def __init__( self, x = 0, y = 0, bearing = 0, waypoint = None ):
 		self.x = x
 		self.y = y
 		self.bearing = bearing
 		self.compass = deque( [ 'n', 'e', 's', 'w' ] )
+		self.waypoint = waypoint
 
-	def check_heading( self ):
+
+	def check_heading( self, idx = False ):
 		bearing = self.bearing % 360
 		q, r = divmod( bearing, 90 )
 
 		if r != 0:
 			print( 'ERROR: Unexpected data ' )
 
-		return self.compass[ q ]
+		if idx:
+			return q
+		else:
+			return self.compass[ q ]
 
 
 	def get_position( self ):
@@ -117,49 +122,6 @@ class boat( ):
 		value = int( data[ 1: ] )
 
 		return direction, value
-
-
-	def move_boat( self, data ):
-		direction, val = self.parse_input( data )
-
-		if direction == 'f':
-			direction = self.check_heading( )
-
-		if direction in [ 'l', 'r' ]:
-			self.turn_boat( direction, val )
-
-		if direction == 'n':
-			self.y += val
-
-		if direction == 'e':
-			self.x += val
-
-		if direction == 's':
-			self.y -= val
-
-		if direction == 'w':
-			self.x -= val
-
-
-class boat2( boat ):
-
-	def __init__( self, x = 0, y = 0, bearing = 0, waypoint = [ 0, 0 ] ):
-		self.waypoint = waypoint
-
-		super( ).__init__( x, y, bearing )
-
-
-	def check_heading( self, idx = False ):
-		bearing = self.bearing % 360
-		q, r = divmod( bearing, 90 )
-
-		if r != 0:
-			print( 'ERROR: Unexpected data ' )
-
-		if idx:
-			return q
-		else:
-			return self.compass[ q ]
 
 
 	def set_waypoint( self, direction, val ):
@@ -209,34 +171,64 @@ class boat2( boat ):
 			if waypoint[ 3 ]:
 				self.waypoint[ 0 ] = waypoint[ 3 ] * -1
 
-		print( )
-
 
 	def move_boat( self, data ):
 		direction, val = self.parse_input( data )
 
-		if direction == 'f':
-			direction = self.check_heading( )
+		if self.waypoint is None:
+			if direction == 'f':
+				direction = self.check_heading( )
+
+			if direction in [ 'l', 'r' ]:
+				self.turn_boat( direction, val )
 
 			if direction == 'n':
-				self.x += val * self.waypoint[ 0 ]
-				self.y += val * self.waypoint[ 1 ]
+				self.y += val
 
 			if direction == 'e':
-				self.x += val * self.waypoint[ 0 ]
-				self.y += val * self.waypoint[ 1 ]
+				self.x += val
 
 			if direction == 's':
-				self.x -= val * self.waypoint[ 0 ]
-				self.y -= val * self.waypoint[ 1 ]
+				self.y -= val
 
 			if direction == 'w':
-				self.x -= val * self.waypoint[ 0 ]
-				self.x -= val * self.waypoint[ 0 ]
+				self.x -= val
 
-			print( )
 		else:
-			self.set_waypoint( direction, val )
+			if direction == 'f':
+				direction = self.check_heading( )
+
+				if direction == 'n':
+					self.x += val * self.waypoint[ 0 ]
+					self.y += val * self.waypoint[ 1 ]
+
+				if direction == 'e':
+					self.x += val * self.waypoint[ 0 ]
+					self.y += val * self.waypoint[ 1 ]
+
+				if direction == 's':
+					self.x -= val * self.waypoint[ 0 ]
+					self.y -= val * self.waypoint[ 1 ]
+
+				if direction == 'w':
+					self.x -= val * self.waypoint[ 0 ]
+					self.y -= val * self.waypoint[ 1 ]
+
+			else:
+				self.set_waypoint( direction, val )
+
+
+def main( data, question_2 = False ):
+	ferry = Boat_Ferry( bearing = 90 )
+
+	if question_2:
+		ferry.waypoint = [ 10, 1 ]
+
+	for x in data:
+		ferry.move_boat( x )
+
+	manhattan_dist = ferry.get_position( )
+	print( 'The Manhattan distance travelled is: {0}\t( {1}, {2} )'.format( abs( manhattan_dist[ 0 ] ) + abs( manhattan_dist[ 1 ] ), manhattan_dist[ 0 ], manhattan_dist[ 1 ] ) )
 
 
 
@@ -244,21 +236,10 @@ if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_12_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_12_input.txt'
 
-	data = [ ]
+	raw_data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		data = [ line.strip( ) for line in input_file.readlines( ) ]
+		raw_data = [ line.strip( ) for line in input_file.readlines( ) ]
 
-	ferry = boat( bearing = 90 )
-	for x in data:
-		ferry.move_boat( x )
-
-	ferry2 = boat2( bearing = 90, waypoint = [ 10, 1 ] )
-	for x in data:
-		ferry2.move_boat( x )
-
-	manhattan_dist = ferry.get_position( )
-	print( 'The Manhattan distance travelled is: {0}\t( {1}, {2} )'.format( abs( manhattan_dist[ 0 ] ) + abs( manhattan_dist[ 1 ] ), manhattan_dist[ 0 ], manhattan_dist[ 1 ] ) )
-
-	manhattan_dist = ferry2.get_position( )
-	print( 'The Manhattan distance travelled is: {0}\t( {1}, {2} )'.format( abs( manhattan_dist[ 0 ] ) + abs( manhattan_dist[ 1 ] ), manhattan_dist[ 0 ], manhattan_dist[ 1 ] ) )
+	main( raw_data )
+	main( raw_data, question_2 = True )
