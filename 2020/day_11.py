@@ -218,8 +218,6 @@ Both parts of this puzzle are complete! They provide two gold stars: **
 
 '''
 
-from collections import deque
-
 test_data_1 = [ 'L.LL.LL.LL',
 					 'LLLLLLL.LL',
 					 'L.L.L..L..',
@@ -254,19 +252,24 @@ test_data_4 = [ '.##.##.',
 					 '#.#.#.#',
 					 '.##.##.' ]
 
+EMPTY_SEAT = 'L'
+FLOOR = '.'
+OCCUPIED_SEAT = '#'
+
+
 def get_occupied_seat( idx, row ):
 
 	# Out of range error
 	if 0 > idx or idx >= len( row ):
 		return None
 
-	if row[ idx ] == '#':
+	if row[ idx ] == OCCUPIED_SEAT:
 		return True
 
-	elif row[ idx ] == 'L':
+	elif row[ idx ] == EMPTY_SEAT:
 		return False
 
-	elif row[ idx ] == '.':
+	elif row[ idx ] == FLOOR:
 		return None
 
 
@@ -354,19 +357,18 @@ def take_seats( data, adjacent = True ):
 				if adjacent:
 					occupied_seats = check_adjacent_seats( row_num, data, seat_num )
 
-					if occupied_seats == 0 and seat == 'L':
-						new_seats[ seat_num ] = '#'
-					elif occupied_seats >= 4 and seat == '#':
-						new_seats[ seat_num ] = 'L'
+					if occupied_seats == 0 and seat == EMPTY_SEAT:
+						new_seats[ seat_num ] = OCCUPIED_SEAT
+					elif occupied_seats >= 4 and seat == OCCUPIED_SEAT:
+						new_seats[ seat_num ] = EMPTY_SEAT
 
 				else:
 					occupied_seats = check_visible_seats( row_num, data, seat_num )
 
-					if occupied_seats == 0 and seat == 'L':
-						new_seats[ seat_num ] = '#'
-					elif occupied_seats >= 5 and seat == '#':
-						new_seats[ seat_num ] = 'L'
-
+					if occupied_seats == 0 and seat == EMPTY_SEAT:
+						new_seats[ seat_num ] = OCCUPIED_SEAT
+					elif occupied_seats >= 5 and seat == OCCUPIED_SEAT:
+						new_seats[ seat_num ] = EMPTY_SEAT
 
 			result = ''.join( [ str( seat ) for seat in new_seats ] )
 
@@ -377,25 +379,12 @@ def take_seats( data, adjacent = True ):
 def get_occupied_seats( data, adjacent = True ):
 	result = data
 	old_result = [ ]
-	i = 1
-
-	# print( 'Pass #0')
-	# for x in result:
-		# print( '\t{0}'.format( x ) )
-	# print( '' )
 
 	while result != old_result:
 		old_result = result.copy( )
 		result = take_seats( result, adjacent = adjacent )
 
-		# if old_result != result:
-			# print( 'Pass #{0}'.format( i ) )
-			# for x in result:
-				# print( '\t{0}'.format( x ) )
-			# print( '' )
-		# i += 1
-
-	n = sum( [ x.count( '#' ) for x in result ] )
+	n = sum( [ x.count( OCCUPIED_SEAT ) for x in result ] )
 	print( 'Occupied seats: {0}'.format( n ) )
 
 
@@ -404,10 +393,10 @@ if __name__ == "__main__":
 	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_11_input.txt'
 	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_11_input.txt'
 
-	data = [ ]
+	raw_data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		data = [ line.strip( ) for line in input_file.readlines( ) ]
+		raw_data = [ line.strip( ) for line in input_file.readlines( ) ]
 
-	get_occupied_seats( data )
-	get_occupied_seats( data, adjacent = False )
+	get_occupied_seats( raw_data )
+	get_occupied_seats( raw_data, adjacent = False )
