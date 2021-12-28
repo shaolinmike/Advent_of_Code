@@ -86,7 +86,8 @@ In this example, there are 5 sums that are larger than the previous sum.
 Consider sums of a three-measurement sliding window. How many sums are larger than the previous sum?
 1627
 
-That's the right answer! You are one gold star closer to finding the sleigh keys.
+Both parts of this puzzle are complete! They provide two gold stars: **
+
 '''
 
 
@@ -98,15 +99,11 @@ def sliding_sum( data, num_measurements = 1 ):
 	larger_sums = -1
 	previous_sum = 0
 
-
 	for i in range( 0, len( data ) - 2 ):
 		current_sum = sum( data[ i : i + num_measurements ] )
 
 		if current_sum > previous_sum:
 			larger_sums += 1
-
-		print( 'i: {0:5} -- [ {1}, {2}, {3} ] - {4} ({5})'.format( i, data[ i ], data[ i + 1 ], data[ i + 2 ], current_sum, larger_sums ) )
-		# print( '\t\tPrevious sum: {0}\t\tCurrent sum: {1}'.format( previous_sum, current_sum ) )
 
 		previous_sum = current_sum
 		current_sum = 0
@@ -122,8 +119,6 @@ def check_elevation( data ):
 
 	while len( data ) > 1:
 		current_data = data.pop( 0 )
-		# print( test_data )
-		# print( "{0} : {1}\n".format( current_data, test_data[ 0 ] ) )
 
 		if current_data < data[ 0 ]:
 			depth_deeper += 1
@@ -139,7 +134,6 @@ def main( data ):
 	print( "Deeper elevations: {0}".format( depth_deeper ) )
 	print( "Shallower elevations: {0}".format( depth_shallower ) )
 
-	sum_data = list( data )
 	num_larger_sums = sliding_sum( data, num_measurements = 3 )
 	print( 'Number of sums larger than the previous: {0}'.format( num_larger_sums ) )
 
