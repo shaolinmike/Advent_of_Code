@@ -63,27 +63,64 @@ Now, the above example does something different:
 After following these new instructions, you would have a horizontal position of 15 and a depth of 60. (Multiplying these produces 900.)
 
 Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. What do you get if you multiply your final horizontal position by your final depth?
+
+Your puzzle answer was 2134882034.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
 '''
 
+test_data = [ ( 'forward', '5'),
+			  ( 'down', '5' ),
+			  ( 'forward', '8' ),
+			  ( 'up', '3' ),
+			  ( 'down', '8' ),
+			  ( 'forward', '2' )
+			]
 
-def main( data ):
+
+def move_sub( data, part_two = False ):
+	aim = 0
 	depth = 0
 	distance = 0
 
 	for datum in data:
 		if 'forward' in datum[ 0 ]:
 			distance += int( datum[ 1 ] )
+			if part_two:
+				depth += aim * int( datum[ 1 ] )
 
 		elif 'back' in datum[ 0 ]:
 			distance -= int( datum[ 1 ] )
 
 		elif 'up' in datum[ 0 ]:
-			depth -= int( datum[ 1 ] )
+			aim -= int( datum[ 1 ] )
+			if not part_two:
+				depth -= int( datum[ 1 ] )
 
 		elif 'down' in datum[ 0 ]:
-			depth += int( datum[ 1 ] )
+			aim += int( datum[ 1 ] )
+			if not part_two:
+				depth += int( datum[ 1 ] )
 
-	print( 'Result:\n\tDistance: {0}\n\tDepth: {1}\n\tValue: {2}'.format( distance, depth, distance * depth ) )
+	return aim, depth, distance
+
+
+def main( data ):
+	aim = 0
+	depth = 0
+	distance = 0
+
+	# Part One Solution
+	_, depth, distance = move_sub( data )
+	print( 'Part One: ' )
+	print( '\tResult:\n\t\tDistance: {0}\n\t\tDepth: {1}\n\t\tValue: {2}\n'.format( distance, depth, distance * depth ) )
+
+	# Part Two Solution
+	_, depth, distance = move_sub( data, part_two = True )
+	print( 'Part Two: ' )
+	print( '\tResult:\n\t\tDistance: {0}\n\t\tDepth: {1}\n\t\tValue: {2}\n'.format( distance, depth, distance * depth ) )
+
 
 
 if __name__ == "__main__":
