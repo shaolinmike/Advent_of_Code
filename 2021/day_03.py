@@ -73,18 +73,21 @@ Finally, to find the life support rating, multiply the oxygen generator rating (
 
 Use the binary numbers in your diagnostic report to calculate the oxygen generator rating and CO2 scrubber rating, then multiply them together. What is the life support rating of the submarine? (Be sure to represent your answer in decimal, not binary.)
 
+Your puzzle answer was 5736383.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
 '''
 
 test_data = [ '00100', '11110', '10110', '10111', '10101', '01111', '00111', '11100', '10000', '11001', '00010', '01010' ]
 
-
-def parse_data( data ):
+def parse_gamma_epsilon_rate( data ):
 	epsilon_rate = ''
 	gamma_rate = ''
 
 	for bit in range( 0, len( data[ 0 ] ) ):
-		zero_bit = [ ]
 		one_bit = [ ]
+		zero_bit = [ ]
 
 		for datum in data:
 			if datum[ bit ] == '0':
@@ -100,18 +103,85 @@ def parse_data( data ):
 			epsilon_rate += '0'
 			gamma_rate += '1'
 
+	return int( gamma_rate, 2 ), int( epsilon_rate, 2 )
 
-	return int( epsilon_rate, 2 ), int( gamma_rate, 2 )
+def filter_ratings( data, return_co2 = True ):
+	bit = 0
+	filter_val = '0'
+	rating = ''
+
+	if not return_co2:
+		filter_val = '1'
+
+	while rating == '':
+		one_bit = [ ]
+		zero_bit = [ ]
+
+		for datum in data:
+			if datum[ bit ] == '0':
+				zero_bit.append( datum )
+			else:
+				one_bit.append( datum )
+
+		# print( '[0] {0} - {1}\n[1] {2} - {3}\n'.format( len( zero_bit ), zero_bit, len( one_bit ), one_bit ) )
+
+		if len( one_bit ) == len( zero_bit ):
+			if return_co2:
+				if len( zero_bit ) > 1:
+					data = zero_bit
+
+				else:
+					rating = zero_bit[ 0 ]
+			else:
+				if len( one_bit ) > 1:
+					data = one_bit
+
+				else:
+					rating = one_bit[ 0 ]
+
+		else:
+			if return_co2 and len( one_bit ) < len( zero_bit ):
+				data = one_bit
+
+			elif not return_co2 and len( one_bit ) > len( zero_bit ):
+				data = one_bit
+
+			else:
+				data = zero_bit
+
+		bit += 1
+
+	return int( rating, 2 )
+
+
+def parse_o2_co2_rating( data ):
+	rating_co2 = 0
+	rating_o2 = 0
+
+	# O=C=O Rating
+	rating_co2 = filter_ratings( data )
+
+	# O=O Rating
+	rating_o2 = filter_ratings( data, return_co2 = False  )
+
+	return rating_co2, rating_o2
+
 
 
 def main( data ):
 	gamma_rate = ''
 	epsilon_rate = ''
 
-	epsilon_rate, gamma_rate = parse_data( data )
+	co2_rating = 0
+	o2_rating = 0
 
-	print( 'Gamma rate: {0}\n\tEpsilon rate: {1}'.format( gamma_rate, epsilon_rate ) )
+	# Part One
+	gamma_rate, epsilon_rate = parse_gamma_epsilon_rate( data )
 	print( 'Power consumption: {0}'.format( gamma_rate * epsilon_rate ) )
+
+	# Part Two
+	co2_rating, o2_rating = parse_o2_co2_rating( data )
+	print( 'Life Support Rating: {0}'.format( co2_rating * o2_rating ) )
 
 
 if __name__ == "__main__":
