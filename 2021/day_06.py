@@ -53,15 +53,128 @@ In this example, after 18 days, there are a total of 26 fish. After 80 days, the
 
 Find a way to simulate lanternfish. How many lanternfish would there be after 80 days?
 
+Your puzzle answer was 385391.
+
+The first half of this puzzle is complete! It provides one gold star: *
+
+--- Part Two ---
+
+Suppose the lanternfish live forever and have unlimited food and space. Would they take over the entire ocean?
+
+After 256 days in the example above, there would be a total of 26984457539 lanternfish!
+
+How many lanternfish would there be after 256 days?
+
+Your puzzle answer was 1728611055389.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
 
 '''
 
+from collections import defaultdict, deque
+import numpy
+import time
 
-test_data = [ ]
+test_data = [ 3,4,3,1,2 ]
+
+DEBUG = False
+
+
+def draw( data ):
+	print( '\t[-1 ]: {0}\n\t[ 0 ]: {1}\n\t[ 1 ]: {2}\n\t[ 2 ]: {3}\n\t[ 3 ]: {4}\n\t[ 4 ]: {5}\n\t[ 5 ]: {6}\n\t[ 6 ]: {7}\n\t[ 7 ]: {8}\n\t[ 8 ]: {9}\n'.format( data[ -1 ],
+																	  data[ 0 ],
+																	  data[ 1 ],
+																	  data[ 2 ],
+																	  data[ 3 ],
+																	  data[ 4 ],
+																	  data[ 5 ],
+																	  data[ 6 ],
+																	  data[ 7 ],
+																	  data[ 8 ]
+																	)
+		 )
+
+
+def simulate_fish( data ):
+
+	for i in range( 0, 10 ):
+		data[ i - 1 ] = data[ i ]
+
+	if DEBUG:
+		draw( data )
+
+	if data[ -1 ]:
+		num_new_fish = data[ -1 ]
+		data[ 6 ] = data[ 6 ] + data[ -1 ]
+		data[ 8 ] = 1 * num_new_fish
+		data[ -1 ] = 0
+
+	return data
+
+
+def simulate_day( data ):
+	# # Slow
+	# fish_array = list( data )
+	# for i in range( 0, len( fish_array ) ):
+		# fish_array[ i ] -= 1
+		# if fish_array[ i ] < 0:
+			# fish_array[ i ] = 6
+			# fish_array.append( 8 )
+
+	# # Faster
+	# fish_array = data - 1
+	# num_new_fish = numpy.count_nonzero( fish_array == -1 )
+	# if num_new_fish:
+		# new_fish = numpy.empty( num_new_fish )
+		# new_fish.fill( 8 )
+		# fish_array = numpy.where( fish_array == -1, 6, fish_array )
+		# fish_array = numpy.concatenate( ( fish_array, new_fish ) )
+
+	# Fastest
+	fish_array = simulate_fish( data )
+
+	# if DEBUG: print( data )
+
+	return fish_array
+
+
+def count_fish( data ):
+	num_fish = 0
+
+	for i in data.keys( ):
+		num_fish += data[ i ]
+
+	return num_fish
+
+
+def parse_data( data ):
+	data_dict = defaultdict( int )
+
+	data_dict[ -1 ] = 0
+	for i in range( 0, 9 ):
+		data_dict[ i ] = 0
+
+	for x in data:
+		data_dict[ x ] += 1
+
+	return data_dict
 
 
 def main( data ):
-	pass
+	num_days = 256
+
+	# Fastest
+	data = parse_data( data )
+	if DEBUG: draw( data )
+
+	for i in range( 0, num_days ):
+		data = simulate_day( data )
+
+	# num_fish = str( len( data ) )
+	# Fastest
+	num_fish = count_fish( data )
+	print( 'After {0} days, there are {1} lantern fish.'.format( num_days, num_fish ) )
+
 
 
 if __name__ == "__main__":
@@ -70,6 +183,13 @@ if __name__ == "__main__":
 	raw_data = [ ]
 
 	with open( input, 'r' ) as input_file:
-		raw_data = [ int( num ) for num in input_file.read( ).split( ) ]
+		raw_data = [ int( num ) for num in input_file.read( ) if num.isdigit( ) ]
 
+	# # Slow
+	# main( test_data )
+
+	# # Faster
+	# main( numpy.array( test_data ) )
+
+	# Fastest
 	main( raw_data )
