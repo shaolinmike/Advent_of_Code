@@ -46,132 +46,121 @@ Your puzzle answer was 14184.
 Both parts of this puzzle are complete! They provide two gold stars: **
 
 """
-from collections import defaultdict, deque
-
-DRAW = 3
-LOSE = 0
-WIN = 6
-
-move_key = deque([0,1,2])
-move_mapping = {'A': 0, # rock
-                'B': 1, # paper
-                'C': 2, # scissors
-                'X': 0, # rock
-                'Y': 1, # paper
-                'Z': 2  # scissors
-                }
-strategy_mapping = {'X': 'lose',
-                    'Y': 'draw',
-                    'Z': 'win'
-                    }
-##################
-ROCK = 0
-PAPER = 1
-SCISSORS = 2
-
 MOVE_MAP = {'X': 'lose',
             'Y': 'draw',
             'Z': 'win'
             }
 
 POINT_MAP = {'A': 1,# rock
-            'B': 2, # paper
+             'B': 2, # paper
             'C': 3, # scissors
             'X': 1, # rock
             'Y': 2, # paper
             'Z': 3  # scissors
             }
-################
 
 test_data = [('A','Y'), ('B','X'), ('C','Z')]
 
-def pick_move(elf_move, player_strategy):
-    elf_move_idx = move_mapping[elf_move]
-    player_move_idx = 0
-    move_list = move_key.copy()
+def pick_move(elf_move, player_move):
+	move = ''
 
-    if strategy_mapping[player_strategy] == 'draw':
-        player_move_idx = elf_move_idx
-
-    else:
-        if strategy_mapping[player_strategy] == 'lose':
-            player_move_idx = move_list.rotate(elf_move_idx - 1)
-
-        else:
-            player_move_idx = move_list.rotate(elf_move_idx + 1)
-
-        player_move_idx = move_list[0]
-
-    return list(strategy_mapping.keys())[player_move_idx]
-
-def resolve_turn(elf_move, player_move):
-    score = 0
-
-    elf_move_idx = move_mapping[elf_move]
-    player_move_idx = move_mapping[player_move]
+	if elf_move == player_move:
+		return
 
 
-    if elf_move_idx == player_move_idx:
-        score += DRAW
-        print(f'\tYou tied. {elf_move} : {player_move}')
+def part_one(raw_data):
+	total_score = 0
 
-    elif elf_move_idx == ROCK and player_move_idx == SCISSORS:
-        score += LOSE
-        print(f'\tYou lose. {elf_move} beats {player_move}')
+	for round_num, datum in enumerate(raw_data):
+		score = 0
 
-    elif elf_move_idx == SCISSORS and player_move_idx == ROCK:
-        score += WIN
-        print(f'\tYou win. {elf_move} loses to {player_move}')
+		# Scissors lose to Rock
+		if POINT_MAP[datum[0]] == 1 and POINT_MAP[datum[1]] == 3:
+			print(f'You lose. {datum[0]} beats {datum[1]}') # You lost. No points
 
-    else:
-        if elf_move_idx < player_move_idx:
-            score += WIN
-            print(f'\tYou win. {elf_move} loses to {player_move}')
+		# Rock beats scissors
+		elif POINT_MAP[datum[0]] == 3 and POINT_MAP[datum[1]] == 1:
+			score += 6
+			print(f'You win. {datum[0]} loses to {datum[1]}')
 
-        else:
-            score += LOSE
-            print(f'\tYou lose. {elf_move} beats {player_move}')
+		elif POINT_MAP[datum[0]] < POINT_MAP[datum[1]]:
+			score += 6
+			print(f'You win. {datum[0]} loses to {datum[1]}')
 
-    score += move_key[player_move_idx] + 1
-    return score
+		# You tied
+		elif POINT_MAP[datum[0]] == POINT_MAP[datum[1]]:
+			score += 3
+			print(f'You tied. {datum[0]} : {datum[1]}')
 
-def main(raw_data):
-    # Part 1
-    total_score = 0
-    print('ROUND ONE: FIGHT!')
+		else:
+			pass # You lost. No points
 
-    for round_num, (elf_move, player_move) in enumerate(raw_data):
-        score = 0
+		# You get points for the item thrown
+		score += POINT_MAP[datum[1]]
+		total_score += score
 
-        # Score the round
-        score += resolve_turn(elf_move, player_move)
-        total_score += score
+		print(f'Score for round {round_num+1}: {score}\nTotal score: {total_score}\n\n')
 
-        print(f'\tScore for round {round_num+1}: {score}\n\tTotal score: {total_score}\n\n')
 
-    # Part 2
-    total_score = 0
-    print('ROUND TWO: FIGHT!')
+def part_two(raw_data):
+	total_score = 0
 
-    for round_num, (elf_move, player_strategy) in enumerate(raw_data):
-        score = 0
+	for round_num, datum in enumerate(raw_data):
+		score = 0
+		my_move = 0
 
-        player_move = pick_move(elf_move, player_strategy)
+		if MOVE_MAP[datum[1]] == 'lose':
+			if POINT_MAP[datum[0]] == 1:
+				my_move = 3
+			else:
+				my_move = POINT_MAP[datum[0]] - 1
 
-        # Score the round
-        score += resolve_turn(elf_move, player_move)
-        total_score += score
+		elif MOVE_MAP[datum[1]] == 'draw':
+			my_move = POINT_MAP[datum[0]]
 
-        print(f'\tScore for round {round_num+1}: {score}\n\tTotal score: {total_score}\n\n')
+		else:
+			if POINT_MAP[datum[0]] == 3:
+				my_move = 1
+			else:
+				my_move = POINT_MAP[datum[0]] + 1
+
+		# Scissors lose to Rock
+		if POINT_MAP[datum[0]] == 1 and my_move == 3:
+			print(f'You draw. {datum[0]} ties {datum[1]}') # You lost. No points
+
+		# Rock beats scissors
+		elif POINT_MAP[datum[0]] == 3 and my_move == 1:
+			score += 6
+			print(f'You win. {datum[0]} loses to {datum[1]}')
+
+		elif POINT_MAP[datum[0]] < my_move:
+			score += 6
+			print(f'You win. {datum[0]} loses to {datum[1]}')
+
+		# You tied
+		elif POINT_MAP[datum[0]] == my_move:
+			score += 3
+			print(f'You tied. {datum[0]} : {datum[1]}')
+
+		else:
+			pass # You lost. No points
+
+		# You get points for the item thrown
+		score += my_move
+		total_score += score
+
+		print(f'Score for round {round_num+1}: {score}\nTotal score: {total_score}\n\n')
 
 
 
 if __name__ == "__main__":
-    input = r"D:\Projects\Advent_of_Code\2022\day_02_input.txt"
-    raw_data = []
+	input = r"D:\Projects\Advent_of_Code\2022\day_02_input.txt"
+	raw_data = []
 
-    with open(input, "r") as input_file:
-        raw_data = [tuple(line.split()) for line in input_file.readlines( ) ]
+	with open(input, "r") as input_file:
+		raw_data = [tuple(line.split()) for line in input_file.readlines( ) ]
 
-    # main(test_data)
-    main(raw_data)
+	# part_one(test_data)
+	# part_one(raw_data)
+	part_two(test_data)
+	part_two(raw_data)
