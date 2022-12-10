@@ -80,9 +80,11 @@ To begin, find all of the directories with a total size of at most 100000, then 
 
 Find all of the directories with a total size of at most 100000. What is the sum of the total sizes of those directories?
 
+
 Your puzzle answer was 1141028.
 
 The first half of this puzzle is complete! It provides one gold star: *
+
 
 --- Part Two ---
 Now, you're ready to choose a directory to delete.
@@ -101,6 +103,12 @@ Delete directory /, which would increase unused space by 48381165.
 Directories e and a are both too small; deleting them would not free up enough space. However, directories d and / are both big enough! Between these, choose the smallest: d, increasing unused space by 24933642.
 
 Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. What is the total size of that directory?
+
+
+Your puzzle answer was 8278005.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
 """
 
 test_data = ['$ cd /',

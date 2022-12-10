@@ -32,7 +32,11 @@ Here are a few more examples:
 
 How many characters need to be processed before the first start-of-packet marker is detected?
 
+
 Your puzzle answer was 1080.
+
+The first half of this puzzle is complete! It provides one gold star: *
+
 
 --- Part Two ---
 Your device's communication system is correctly detecting packets, but still isn't working. It looks like it also needs to look for messages.
@@ -48,6 +52,7 @@ Here are the first positions of start-of-message markers for all of the above ex
 	zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw: first marker after character 26
 
 How many characters need to be processed before the first start-of-message marker is detected?
+
 
 Your puzzle answer was 3645.
 

@@ -45,9 +45,11 @@ Immediately before the program would run an instruction a second time, the value
 
 Run your copy of the boot code. Immediately before any instruction is executed a second time, what value is in the accumulator?
 
+
 Your puzzle answer was 1810.
 
 The first half of this puzzle is complete! It provides one gold star: *
+
 
 --- Part Two ---
 
@@ -90,6 +92,7 @@ Fix the program so that it terminates normally by changing exactly one jmp (to n
 Your puzzle answer was 969.
 
 Both parts of this puzzle are complete! They provide two gold stars: **
+
 '''
 
 test_data = [ ( 'nop', '+0' ),

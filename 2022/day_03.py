@@ -35,7 +35,11 @@ In the above example, the priority of the item type that appears in both compart
 
 Find the item type that appears in both compartments of each rucksack. What is the sum of the priorities of those item types?
 
+
 Your puzzle answer was 7446.
+
+The first half of this puzzle is complete! It provides one gold star: *
+
 
 --- Part Two ---
 
@@ -65,9 +69,11 @@ Priorities for these items must still be found to organize the sticker attachmen
 
 Find the item type that corresponds to the badges of each three-Elf group. What is the sum of the priorities of those item types?
 
+
 Your puzzle answer was 2646.
 
 Both parts of this puzzle are complete! They provide two gold stars: **
+
 """
 
 test_data = [ 'vJrwpWtwJgWrhcsFMMfFFhFp',
