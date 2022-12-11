@@ -245,9 +245,11 @@ So, there are 13 positions the tail visited at least once.
 
 Simulate your complete hypothetical series of motions. How many positions does the tail of the rope visit at least once?
 
+
 Your puzzle answer was 5981.
 
 The first half of this puzzle is complete! It provides one gold star: *
+
 
 --- Part Two ---
 A rope snaps! Suddenly, the river is getting a lot closer than you remember. The bridge is still there, but some of the ropes that broke are now whipping toward you as you fall through the air!
@@ -680,7 +682,13 @@ Now, the tail (9) visits 36 positions (including s) at least once:
 .........########.........
 Simulate your complete series of motions on a larger rope with ten knots. How many positions does the tail of the rope visit at least once?
 
+
+Your puzzle answer was 2352.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
 """
+import math
 
 test_data = ['R4',
 			 'U4',
@@ -690,6 +698,26 @@ test_data = ['R4',
 			 'D1',
 			 'L5',
 			 'R2'
+			]
+
+test_data_1 = [ ['R', 4],
+				['U', 4],
+				['L', 3],
+				['D', 1],
+				['R', 4],
+				['D', 1],
+				['L', 5],
+				['R', 2]
+			]
+
+test_data_2 = [ ['R', 5],
+				['U', 8],
+				['L', 8],
+				['D', 3],
+				['R', 17],
+				['D', 10],
+				['L', 25],
+				['U', 20]
 			]
 
 MOVE_LEFT 	= 'L'
@@ -735,38 +763,70 @@ class Rope():
 		else:
 			pass
 
-		self.move_child(vector)
+		if self.child:
+			self.move_child(vector)
+
 		self._moves.append(self.get_position())
 
-
-	def move_child(self, vector):
+	def move_child(self, vector, child_move = False):
 		direction, magnitude = vector
-		child_x, child_y = self.child.get_position()
 
-		delta_x = self.x - child_x
-		delta_y = self.y - child_y
+		delta_x = self.x - self.child.x
+		delta_y = self.y - self.child.y
 
+		# Head and tail are touching
 		if [abs(delta_x), abs(delta_y)] in [[0,0], [0,1], [1,1], [1,0]]:
-			pass # Do nothing. Parent is in the way
+			pass # Do nothing.
+
+		# Head two steps directly up, down, left or right
+		elif [abs(delta_x), abs(delta_y)] in [[0,2], [2,0]]:
+			# Take a step to stay close
+			if abs(delta_x) == 2:
+				self.child.x = self.child.x + int(delta_x/2)
+
+			else: # abs(delta_y) == 2
+				self.child.y = self.child.y + int(delta_y/2)
+
+		# Head and tail AREN'T touching and aren't in the same row or column
 		else:
-			self.child.x = self.x - 1
-			self.child.y = self.y - 1
+			if abs(delta_x) == 2 and abs(delta_y) == 2:
+				self.child.x = math.ceil((self.x + self.child.x)/2)
+				self.child.y = math.ceil((self.y + self.child.y)/2)
+			else:
+				if self.x != self.child.x  and self.y != self.child.y:
+					if abs(delta_x) > 1:
+						if direction == MOVE_LEFT:
+							self.child.x = math.ceil((self.x + self.child.x)/2)
+						else:
+							self.child.x = math.ceil((self.x + self.child.x)/2)
+						self.child.y = self.child.y + delta_y
 
-			if abs(delta_x) > 1:
-				if direction == MOVE_LEFT:
-					self.child.x = self.x + 1
-				else:
-					self.child.x = self.x - 1
-				self.child.y = self.y
-
-			elif abs(delta_y) > 1:
-				self.child.x = self.x
-				if direction == MOVE_DOWN:
-					self.child.y = self.y + 1
-				else:
-					self.child.y = self.y - 1
+					elif abs(delta_y) > 1:
+						self.child.x = self.child.x + delta_x
+						if direction == MOVE_DOWN:
+							self.child.y = math.ceil((self.y + self.child.y)/2)
+						else:
+							self.child.y = math.ceil((self.y + self.child.y)/2)
 
 		self.child._moves.append(self.child.get_position())
+
+		# Move child segments
+		if self.child and self.child.child:
+			next_dir = ''
+			if delta_x > 0:
+				next_dir = 'R'
+				next_mag = delta_x
+			elif delta_x < 0:
+				next_dir = 'L'
+				next_mag = delta_x
+			elif delta_y > 0:
+				next_dir = 'U'
+				next_mag = delta_y
+			else:
+				next_dir = 'D'
+				next_mag = delta_y
+
+			self.child.move_child([next_dir, next_mag], child_move = True)
 
 
 def parse_data(raw_data):
@@ -774,50 +834,65 @@ def parse_data(raw_data):
 	return data
 
 
-def draw(rope_obj):
-	data = rope_obj._moves
-	width = 190 #max([x[0] for x in data]) + 1
-	height = 190 #max([x[1] for x in data]) + 1
+def _get_screen_coord(move, grid_dimension):
+	x = move[0] + int(grid_dimension/2)
+	y = move[1] + int(grid_dimension/2)
 
-	grid = []
-	dimension = max(width, height)
-	row = [0] * dimension * 2
+	return x, y
 
-	for i in range(0, dimension*2):
-		grid.append(row.copy())
+
+def draw(rope_obj, height = 25, width = 25, all_steps = False):
+	render_grid = []
+	data = rope_obj[0]._moves
+
+	if not all_steps:
+		render_grid = _make_grid(height, width)
 
 	# Populate the grid
 	for move_num,i in enumerate(data):
-		parent_x = rope_obj.parent._moves[move_num][0] + int(dimension / 2)
-		parent_y = rope_obj.parent._moves[move_num][1] + int(dimension / 2)
-		# grid[parent_y][parent_x] = 'H'
+		if all_steps: render_grid = _make_grid(height, width)
+		for obj in rope_obj:
+			obj_x = obj._moves[move_num][0] + width
+			obj_y = obj._moves[move_num][1] + height
+			render_grid[obj_y][obj_x] = obj.name
 
-		x_pos = i[0] + int(dimension / 2)
-		y_pos = i[1] + int(dimension / 2)
-		grid[y_pos][x_pos] = 1
+		if all_steps:
+			temp_grid = render_grid.copy()
+			temp_grid.reverse()
+			for row in temp_grid:
+				output = ''.join([x if type(x) != int else '.' for x in row])
+				print(output)
+			print()
 
-		# temp_grid = grid.copy()
-		# temp_grid.reverse()
-		# for row in temp_grid:
-			# print(''.join(row))
-		# print()
-
-	# temp_grid = grid.copy()
-	# temp_grid.reverse()
-	# for row in temp_grid:
-		# print(''.join(row))
-	print()
+	if not all_steps:
+		temp_grid = render_grid.copy()
+		temp_grid.reverse()
+		for row in temp_grid:
+			output = ''.join([x if type(x) != int else '.' for x in row])
+			print(output)
+		print()
 
 
+def _make_grid(width, height):
+	grid = []
+	grid_dimension = max(width, height)
+	row = ['.'] * (grid_dimension * 2 + 1)
 
-def main(raw_data):
-	data = parse_data(raw_data)
+	grid.append(row.copy())
+	for i in range(0, grid_dimension * 2):
+		grid.append(row.copy())
 
-	rope_head = Rope('head')
-	rope_tail = Rope('tail',parent = rope_head)
+	# Draw the start
+	grid[height][width] = 's'
+
+	return grid
+
+
+def part_one(data, height = 5, width = 5, render = True):
+	rope_head = Rope('H')
+	rope_tail = Rope('T',parent = rope_head)
 	rope_head.child = rope_tail
 
-	# Part 1
 	for vector in data:
 		direction, magnitude = vector
 		for i in range(magnitude):
@@ -827,10 +902,68 @@ def main(raw_data):
 		# print(f'[{vector[0]} {vector[1]}]:\t{rope_head.get_position()}')
 		# print(f'\t\t{rope_tail.get_position()}\n')
 
-	draw(rope_tail)
+	if render:
+		# draw([rope_tail, rope_head], 5, 5, all_steps = True)
+		rope_tail.name = '#'
+		draw([rope_tail], height, width)
 
 	unique_positions = len([list(x) for x in set(tuple(x) for x in rope_tail._moves)])
 	print(f'Tail has visited {unique_positions} positions at least once')
+
+
+def part_two(data, height = 10, width = 10, render = True):
+	rope_head = Rope('H')
+	rope_knot1 = Rope('1', parent = rope_head)
+	rope_knot2 = Rope('2', parent = rope_knot1)
+	rope_knot3 = Rope('3', parent = rope_knot2)
+	rope_knot4 = Rope('4', parent = rope_knot3)
+	rope_knot5 = Rope('5', parent = rope_knot4)
+	rope_knot6 = Rope('6', parent = rope_knot5)
+	rope_knot7 = Rope('7', parent = rope_knot6)
+	rope_knot8 = Rope('8', parent = rope_knot7)
+	rope_knot9 = Rope('9',parent = rope_knot8)
+
+	rope_head.child = rope_knot1
+	rope_knot1.child = rope_knot2
+	rope_knot2.child = rope_knot3
+	rope_knot3.child = rope_knot4
+	rope_knot4.child = rope_knot5
+	rope_knot5.child = rope_knot6
+	rope_knot6.child = rope_knot7
+	rope_knot7.child = rope_knot8
+	rope_knot8.child = rope_knot9
+
+	rope = [rope_head, rope_knot1, rope_knot2, rope_knot3, rope_knot4, rope_knot5, rope_knot6, rope_knot7, rope_knot8, rope_knot9]
+
+	for vector in data:
+		direction, magnitude = vector
+		for i in range(magnitude):
+			rope_head.move((direction, 1))
+			# print(f'[{vector[0]} {vector[1]}]:\t{rope_head.get_position()} - H')
+			# print(f'\t\t{rope_knot1.get_position()} - {rope_knot1.name}')
+			# print(f'\t\t{rope_knot2.get_position()} - {rope_knot2.name}')
+			# print(f'\t\t{rope_knot3.get_position()} - {rope_knot3.name}')
+			# print(f'\t\t{rope_knot4.get_position()} - {rope_knot4.name}')
+			# print(f'\t\t{rope_knot5.get_position()} - {rope_knot5.name}')
+			# print(f'\t\t{rope_knot6.get_position()} - {rope_knot6.name}')
+			# print(f'\t\t{rope_knot7.get_position()} - {rope_knot7.name}')
+			# print(f'\t\t{rope_knot8.get_position()} - {rope_knot8.name}')
+			# print(f'\t\t{rope_knot9.get_position()} - T')
+			# print()
+
+	if render:
+		rope.reverse()
+		draw(rope, height, width, all_steps = True)
+
+	unique_positions = len([list(x) for x in set(tuple(x) for x in rope_knot9._moves)])
+	print(f'Tail has visited {unique_positions} positions at least once')
+
+
+def main(raw_data):
+	data = parse_data(raw_data)
+
+	part_one(data, render = False)
+	part_two(data, render = False)
 
 
 
@@ -841,5 +974,7 @@ if __name__ == "__main__":
 	with open(input, "r") as input_file:
 		raw_data = [line.replace(' ','').strip() for line in input_file.readlines()]
 
-	# main(test_data)
+	# part_one(parse_data(test_data))
+	# part_two(test_data_1)
+	# part_two(test_data_2, height = 15, width = 15)
 	main(raw_data)
