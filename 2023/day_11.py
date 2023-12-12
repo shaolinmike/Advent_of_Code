@@ -141,6 +141,10 @@ Starting with the same initial image, expand the universe according to
 these new rules, then find the length of the shortest path between every
 pair of galaxies. What is the sum of these lengths?
 
+Your puzzle answer was 702770569197.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
 """
 
 import copy
@@ -240,13 +244,63 @@ def expand_galaxy_data(data, expansion_rate):
     return galaxy_data, galaxy_dict, galaxy_pairs
 
 
+def expand_galaxy_data_2(data, expansion_rate):
+    galaxy_number = 1
+    galaxy_data = numpy.array(copy.deepcopy(data))
+    galaxy_dict = {}
+    galaxy_pairs = []
+    empty_rows = []
+    empty_cols = []
+
+    # Expand rows
+    for row_idx in range(0, len(galaxy_data) - 1):
+        row = galaxy_data[row_idx]
+        if '#' not in row:
+            empty_rows.append(row_idx)
+
+    # Expand columns
+    for col_idx in range(len(galaxy_data[0]) - 1, 0, -1):
+        # Build Column data
+        col_data = [row[col_idx] for row in galaxy_data]
+
+        # Check for emptiness
+        if '#' not in col_data:
+            empty_cols.append(col_idx)
+            # for row in galaxy_data:
+                # row.insert(col_idx, '.')
+
+    # Number the galaxies
+    for row_idx in range(0, len(galaxy_data)):
+        y_coord = row_idx
+        for col_idx in range(0, len(galaxy_data[row_idx])):
+            x_coord = col_idx
+            if galaxy_data[row_idx][col_idx] == '#':
+                galaxy_data[row_idx][col_idx] = str(galaxy_number)
+                expansion_x = len([x for x in empty_cols if x <= col_idx])
+                expansion_y = len([x for x in empty_rows if x <= row_idx])
+
+                if expansion_x:
+                    x_coord = col_idx + expansion_rate * expansion_x
+
+                if expansion_y:
+                    y_coord = row_idx + expansion_rate * expansion_y
+
+                galaxy_dict[str(galaxy_number)] = (x_coord, y_coord)
+                galaxy_number += 1
+
+    # Galaxy pairs
+    galaxy_pairs = itertools.combinations(galaxy_dict.keys(), 2)
+
+    return galaxy_data, galaxy_dict, galaxy_pairs
+
 
 def parse_data(raw_data):
     # Parse raw_data into a usable form
     data = [deque([x for x in row]) for row in raw_data]
 
     return data
-
+# Low           High
+# 82000210      702771271959
 
 def main(raw_data, part_two = False):
     expansion_rate = 1
@@ -257,8 +311,12 @@ def main(raw_data, part_two = False):
         n = 1000000
         expansion_rate = n - 1
 
-    galaxy_data, galaxy_dict, galaxy_pairs = expand_galaxy_data(data, expansion_rate)
+    if not part_two:
+        galaxy_data, galaxy_dict, galaxy_pairs = expand_galaxy_data(data, expansion_rate)
+    else:
+        galaxy_data, galaxy_dict, galaxy_pairs = expand_galaxy_data_2(data, expansion_rate)
 
+    [print(f'{x}: {galaxy_dict[x]}') for x in galaxy_dict.keys()]
     for galaxy_pair in galaxy_pairs:
         result = calculate_galaxy_dist(galaxy_dict[galaxy_pair[0]], galaxy_dict[galaxy_pair[1]])
         results.append(result)
@@ -266,7 +324,7 @@ def main(raw_data, part_two = False):
     print(f'\nThe sum of the lengths is {sum(results)}')
 
 
-
+# 292 374 1030 8410
 
 if __name__ == "__main__":
     input = r"D:\Projects\Advent_of_Code\2023\day_11_input.txt"
@@ -275,7 +333,7 @@ if __name__ == "__main__":
     with open(input, "r") as input_file:
         raw_data = deque([line for line in input_file.readlines( )])
 
-    main(TEST_DATA)
+    # main(TEST_DATA)
     # main(raw_data)
     # main(TEST_DATA, part_two = True)
-    # main(raw_data, part_two = True)
+    main(raw_data, part_two = True)
