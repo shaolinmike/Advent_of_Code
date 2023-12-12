@@ -167,21 +167,6 @@ TEST_DATA = [ '...#......',
 
 
 
-class GenericObject():
-
-    def __init__(self, id, prop_1, prop_2, quantity=1):
-        self.id = id
-        self.prop_1 = prop_1
-        self.prop_2 = prop_2
-        self.quantity = quantity
-
-    def __repr__(self):
-        return f"<{self.__class__.__name__} {self.id} ({self.prop_1},{self.prop_2})>"
-
-    def __str__(self):
-        return f"<{self.__class__.__name__} {self.id} ({self.prop_1},\n\t\t\t\t{self.prop_2})>"
-
-
 def _draw_map(data):
     for i in data:
         print(''.join(i))
@@ -207,44 +192,6 @@ def calculate_galaxy_dist(galaxy_1, galaxy_2):
 
 
 def expand_galaxy_data(data, expansion_rate):
-    galaxy_number = 1
-    galaxy_data = numpy.array(copy.deepcopy(data))
-    galaxy_dict = {}
-    galaxy_pairs = []
-
-    # Expand rows
-    for row_idx in range(len(galaxy_data) - 1, 0, -1):
-        row = galaxy_data[row_idx]
-        if '#' not in row:
-            expansion_array = numpy.array(['.'] * expansion_rate * len(row)).reshape((expansion_rate, len(row)))
-            galaxy_data = numpy.concatenate((galaxy_data[:row_idx], expansion_array, galaxy_data[row_idx:]))
-            # for i in range(0, expansion_rate):
-                # galaxy_data = numpy.insert(galaxy_data, row_idx, '.', axis=0)
-
-    # Expand columns
-    galaxy_data = numpy.transpose(galaxy_data)
-    for row_idx in range(len(galaxy_data) - 1, 0, -1):
-        row = galaxy_data[row_idx]
-        if '#' not in row:
-            expansion_array = numpy.array(['.'] * expansion_rate * len(row)).reshape((expansion_rate, len(row)))
-            galaxy_data = numpy.concatenate((galaxy_data[:row_idx], expansion_array, galaxy_data[row_idx:]))
-    galaxy_data = numpy.transpose(galaxy_data)
-
-    # Number the galaxies
-    for row_idx in range(0, len(galaxy_data)):
-        for col_idx in range(0, len(galaxy_data[row_idx])):
-            if galaxy_data[row_idx][col_idx] == '#':
-                galaxy_data[row_idx][col_idx] = str(galaxy_number)
-                galaxy_dict[str(galaxy_number)] = (col_idx, row_idx)
-                galaxy_number += 1
-
-    # Galaxy pairs
-    galaxy_pairs = itertools.combinations(galaxy_dict.keys(), 2)
-
-    return galaxy_data, galaxy_dict, galaxy_pairs
-
-
-def expand_galaxy_data_2(data, expansion_rate):
     galaxy_number = 1
     galaxy_data = numpy.array(copy.deepcopy(data))
     galaxy_dict = {}
@@ -299,8 +246,7 @@ def parse_data(raw_data):
     data = [deque([x for x in row]) for row in raw_data]
 
     return data
-# Low           High
-# 82000210      702771271959
+
 
 def main(raw_data, part_two = False):
     expansion_rate = 1
@@ -311,12 +257,8 @@ def main(raw_data, part_two = False):
         n = 1000000
         expansion_rate = n - 1
 
-    if not part_two:
-        galaxy_data, galaxy_dict, galaxy_pairs = expand_galaxy_data(data, expansion_rate)
-    else:
-        galaxy_data, galaxy_dict, galaxy_pairs = expand_galaxy_data_2(data, expansion_rate)
+    galaxy_data, galaxy_dict, galaxy_pairs = expand_galaxy_data(data, expansion_rate)
 
-    [print(f'{x}: {galaxy_dict[x]}') for x in galaxy_dict.keys()]
     for galaxy_pair in galaxy_pairs:
         result = calculate_galaxy_dist(galaxy_dict[galaxy_pair[0]], galaxy_dict[galaxy_pair[1]])
         results.append(result)
@@ -324,7 +266,6 @@ def main(raw_data, part_two = False):
     print(f'\nThe sum of the lengths is {sum(results)}')
 
 
-# 292 374 1030 8410
 
 if __name__ == "__main__":
     input = r"D:\Projects\Advent_of_Code\2023\day_11_input.txt"
