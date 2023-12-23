@@ -250,36 +250,39 @@ In this last example, 10 tiles are enclosed by the loop.
 Figure out whether you have time to search for the nest by calculating the
 area within the loop. How many tiles are enclosed by the loop?
 
+Your puzzle answer was 273.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
 """
 import copy
+import numpy
 
-from collections import deque
 
+TEST_DATA_1 = [ '-L|F7',
+                '7S-7|',
+                'L|7||',
+                '-L-J|',
+                'L|-JF'
+              ]
 
-TEST_DATA_1 = deque([ '-L|F7',
-                      '7S-7|',
-                      'L|7||',
-                      '-L-J|',
-                      'L|-JF'
-                    ])
+TEST_DATA_2 = [ '7-F7-',
+                '.FJ|7',
+                'SJLL7',
+                '|F--J',
+                'LJ.LJ'
+              ]
 
-TEST_DATA_2 = deque([ '7-F7-',
-                      '.FJ|7',
-                      'SJLL7',
-                      '|F--J',
-                      'LJ.LJ'
-                    ])
-
-TEST_DATA_3 = deque([ '...........',
-                      '.S-------7.',
-                      '.|F-----7|.',
-                      '.||.....||.',
-                      '.||.....||.',
-                      '.|L-7.F-J|.',
-                      '.|..|.|..|.',
-                      '.L--J.L--J.',
-                      '...........'
-                    ])
+TEST_DATA_3 = [ '...........',
+                '.S-------7.',
+                '.|F-----7|.',
+                '.||.....||.',
+                '.||.....||.',
+                '.|L-7.F-J|.',
+                '.|..|.|..|.',
+                '.L--J.L--J.',
+                '...........'
+              ]
 
 PIPE_MAP = { '|': [(0,1), (0,-1)],
              '7': [(0,1), (-1,0)],
@@ -321,11 +324,10 @@ def _map_tunnel_recurse(tunnel_data, prev_pos, current_tile, tunnel_map, tunnel_
     new_tile = [tunnel_data[new_pos[1]][new_pos[0]], new_pos[0], new_pos[1]]
 
     if new_tile[0] != 'S':
-        # tunnel_map.append(new_tile)
         tunnel_idx += 1
-        tunnel_idx = _map_tunnel(tunnel_data, current_tile[1:], new_tile, tunnel_map, tunnel_idx)
+        tunnel_map = _map_tunnel(tunnel_data, current_tile[1:], new_tile, tunnel_map, tunnel_idx)
 
-    return tunnel_idx#tunnel_map
+    return tunnel_map
 
 def _map_tunnel(tunnel_data, prev_pos, current_tile, tunnel_map):
     new_tile = current_tile
@@ -372,22 +374,16 @@ def render_map(data, tunnel_map):
 
 
 def calculate_area(data, tunnel_map):
-    area = 0
+    result = 0
 
-    for row in data:
-        in_interior = False
-        for idx, tile in enumerate(row):
-            x = idx
-            y = data.index(row)
-            if [tile, x, y] in tunnel_map:
-                if tile[0] in ['S', '|', '7', 'F', 'J', 'L']:
-                    in_interior = not in_interior
-                else:
-                    pass # Do nothing with '-'
-            elif in_interior:
-                area += 1
+    outer_points = len(tunnel_map[1:])
+    x_positions = [x[1] for x in tunnel_map[1:]]
+    y_positions = [x[2] for x in tunnel_map[1:]]
 
-    return area
+    interior_area = 0.5*numpy.abs(numpy.dot(x_positions,numpy.roll(y_positions,1))-numpy.dot(y_positions,numpy.roll(x_positions,1)))
+    result = int(interior_area - outer_points/2 + 1)
+
+    return result
 
 
 def find_next_pipe_segment(data, start_pos):
@@ -429,7 +425,6 @@ def find_next_pipe_segment(data, start_pos):
         else:
             prev_pipe = [tile, x - 1, y]
 
-
     return next_pipe, prev_pipe
 
 
@@ -450,26 +445,20 @@ def find_start(data):
 
 def map_tunnel(data):
     start_pos = []
-    tunnel_map = deque()
-    tunnel_data = deque(copy.deepcopy(data))
+    tunnel_map = []
+    tunnel_data = copy.deepcopy(data)
 
     start_pos, next_pipe, prev_pipe = find_start(data)
-    tunnel_map.append(['S', start_pos[0], start_pos[1]], 'CCW')
+    tunnel_map.append(['S', start_pos[0], start_pos[1]])
     tunnel_map.append(next_pipe)
+    tunnel_map = _map_tunnel(tunnel_data, start_pos, next_pipe, tunnel_map)
 
-
-    tunnel_idx = _map_tunnel(tunnel_data, start_pos, next_pipe, tunnel_map)
-    # # Rotate the deque to the right row
-    # tunnel_data.rotate(-start_pos[0])
-    # # Rotate the deque to the right column
-    # tunnel_data[0].rotate(-start_pos[1])
-
-    return start_pos, tunnel_idx#tunnel_map
+    return start_pos, tunnel_map
 
 
 def parse_data(raw_data):
     # Parse raw_data into a usable form
-    data = [deque([x for x in row]) for row in raw_data]
+    data = [[x for x in row] for row in raw_data]
 
     return data
 
@@ -478,33 +467,29 @@ def main(raw_data, part_two = False):
     data = parse_data(raw_data)
 
     start_pos, tunnel_map = map_tunnel(data)
-    render = render_map(data, tunnel_map)
+    # render = render_map(data, tunnel_map)
     # _draw_map(render)
     area = calculate_area(data, tunnel_map)
-
 
     if not part_two:
         print(f'\nThe farthest point from the start is {int(len(tunnel_map)/2)} steps away')
     else:
         print(f'\n{area} tiles are enclosed by the loop')
-        # output = r"D:\Projects\Advent_of_Code\2023\day_10_output.txt"
-        # with open(output, "w", encoding="utf-8") as output_file:
-            # for line in render:
-                # output_file.write(''.join(line))
 
 
 
 if __name__ == "__main__":
-    input = r"D:\Projects\Advent_of_Code\2023\day_10_input.txt"
+    filename = __file__.split('\\')[-1].split('.')[0]
+    input = rf"D:\Projects\Advent_of_Code\2023\{filename}_input.txt"
     raw_data = []
 
     with open(input, "r") as input_file:
-        raw_data = deque([line for line in input_file.readlines( )])
+        raw_data = [line for line in input_file.readlines( )]
 
     # main(TEST_DATA_1)
     # main(TEST_DATA_2)
     # main(raw_data)
     # main(TEST_DATA_1, part_two = True)
     # main(TEST_DATA_2, part_two = True)
-    main(TEST_DATA_3, part_two = True)
-    # main(raw_data, part_two = True)
+    # main(TEST_DATA_3, part_two = True)
+    main(raw_data, part_two = True)
