@@ -112,6 +112,11 @@ Convert the hexadecimal color codes into the correct instructions; if the
 Elves follow this new dig plan, how many cubic meters of lava could the
 lagoon hold?
 
+Your puzzle answer was 127844509405501.
+
+Both parts of this puzzle are complete! They provide two gold stars: **
+
+
 """
 
 import itertools
@@ -189,67 +194,100 @@ def _initialize_ground(grid_size):
 
 
 def calculate_area(ground, boundary_coords, part_two = False):
+    outer_points = 0
     result = 0
-    x_positions = boundary_coords[0]
-    y_positions = boundary_coords[1]
+    x_positions = numpy.array(boundary_coords[0], dtype=numpy.int64)
+    y_positions = numpy.array(boundary_coords[1], dtype=numpy.int64)
 
-    outer_points = len([x for row in ground for x in row if x.id == '#'])
+    if part_two:
+        outer_points = ground
+    else:
+        outer_points = len([x for row in ground for x in row if x.id == '#'])
 
     interior_area = 0.5*numpy.abs(numpy.dot(x_positions,numpy.roll(y_positions,1))-numpy.dot(y_positions,numpy.roll(x_positions,1)))
-    result = int((interior_area- outer_points/2 + 1) + outer_points)
+    result = int((interior_area - outer_points/2 + 1) + outer_points)
 
     return result
 
 
-def process_instructions(data, grid_size, offset_pos):
+def process_instructions(data, grid_size, offset_pos, part_two = False):
     boundary_x = []
     boundary_y = []
+    ground = None
 
-    ground = _initialize_ground(grid_size)
     x = offset_pos[0]
     y = offset_pos[1]
 
-    for instruction in data:
-        if instruction[0]== 'U':
-            for i in range(y - 1, y - int(instruction[1]) - 1, -1):
-                ground[i][x].id = '#'
-                ground[i][x].color = instruction[2]
+    if not part_two:
+        ground = _initialize_ground(grid_size)
+        for instruction in data:
+            if instruction[0]== 'U':
+                for i in range(y - 1, y - int(instruction[1]) - 1, -1):
+                    ground[i][x].id = '#'
+                    ground[i][x].color = instruction[2]
+                    boundary_x.append(x)
+                    boundary_y.append(i)
+                    y = i
+                # if DEBUG: [_print(x, render_mode = True) for x in ground]
+
+            elif instruction[0]== 'R':
+                for i in range(x + 1, x + int(instruction[1]) + 1):
+                    ground[y][i].id = '#'
+                    ground[y][i].color = instruction[2]
+                    boundary_x.append(i)
+                    boundary_y.append(y)
+                    x = i
+                # if DEBUG: [_print(x, render_mode = True) for x in ground]
+
+            elif instruction[0]== 'D':
+                for i in range(y + 1, y + int(instruction[1]) + 1):
+                    ground[i][x].id = '#'
+                    ground[i][x].color = instruction[2]
+                    boundary_x.append(x)
+                    boundary_y.append(i)
+                    y = i
+                # if DEBUG: [_print(x, render_mode = True) for x in ground]
+
+            else: # 'L' by process of elimination
+                for i in range(x - 1, x - int(instruction[1]) - 1, -1):
+                    ground[y][i].id = '#'
+                    ground[y][i].color = instruction[2]
+                    boundary_x.append(i)
+                    boundary_y.append(y)
+                    x = i
+                # if DEBUG: [_print(x, render_mode = True) for x in ground]
+    else:
+        dig_verts= 0
+        for instruction in data:
+            dig_verts += int(instruction[1])
+            if instruction[0]== 'U':
+                y -= int(instruction[1])
                 boundary_x.append(x)
-                boundary_y.append(i)
-                y = i
-            # if DEBUG: [_print(x, render_mode = True) for x in ground]
-
-        elif instruction[0]== 'R':
-            for i in range(x + 1, x + int(instruction[1]) + 1):
-                ground[y][i].id = '#'
-                ground[y][i].color = instruction[2]
-                boundary_x.append(i)
                 boundary_y.append(y)
-                x = i
-            # if DEBUG: [_print(x, render_mode = True) for x in ground]
 
-        elif instruction[0]== 'D':
-            for i in range(y + 1, y + int(instruction[1]) + 1):
-                ground[i][x].id = '#'
-                ground[i][x].color = instruction[2]
+            elif instruction[0]== 'R':
+                x += int(instruction[1])
                 boundary_x.append(x)
-                boundary_y.append(i)
-                y = i
-            # if DEBUG: [_print(x, render_mode = True) for x in ground]
-
-        else: # 'L' by process of elimination
-            for i in range(x - 1, x - int(instruction[1]) - 1, -1):
-                ground[y][i].id = '#'
-                ground[y][i].color = instruction[2]
-                boundary_x.append(i)
                 boundary_y.append(y)
-                x = i
-            # if DEBUG: [_print(x, render_mode = True) for x in ground]
+
+            elif instruction[0]== 'D':
+                y += int(instruction[1])
+                boundary_x.append(x)
+                boundary_y.append(y)
+
+            else: # 'L' by process of elimination
+                x -= int(instruction[1])
+                boundary_x.append(x)
+                boundary_y.append(y)
+
+        ground = dig_verts
+        boundary_x = [x for x in reversed(boundary_x)]
+        boundary_y = [x for x in reversed(boundary_y)]
 
     return ground, (boundary_x, boundary_y)
 
 
-def parse_data(raw_data):
+def parse_data(raw_data, part_two = False):
     data = []
     x = 0
     y = 0
@@ -261,8 +299,30 @@ def parse_data(raw_data):
     min_y = 0
     padding = 2
 
-    for datum in raw_data:
-        data.append(datum.split())
+    if part_two:
+        for datum in raw_data:
+            direction = ''
+
+            result = datum.rstrip(')').split('#')[-1]
+
+            if int(result[-1]) == 0:
+                direction = 'R'
+
+            elif int(result[-1]) == 1:
+                direction = 'D'
+
+            elif int(result[-1]) == 2:
+                direction = 'L'
+
+            else: # 'U' by process of elimination
+                direction = 'U'
+
+            new_datum = [direction, int(result[:-1], 16), datum.split()[2]]
+            data.append(new_datum)
+
+    else:
+        for datum in raw_data:
+            data.append(datum.split())
 
     for datum in data:
         if datum[0]== 'U':
@@ -288,17 +348,12 @@ def parse_data(raw_data):
     return data, grid_size, offset_pos
 
 
-
-
 def main(raw_data, part_two = False):
-    data, grid_size, offset_pos = parse_data(raw_data)
-    ground, boundary_coords = process_instructions(data, grid_size, offset_pos)
+    data, grid_size, offset_pos = parse_data(raw_data, part_two)
+    ground, boundary_coords = process_instructions(data, grid_size, offset_pos, part_two)
     result = calculate_area(ground, boundary_coords, part_two)
 
-    if not part_two:
-        print(f'\nThe trench can hold {result} cubic meters of lava')
-    else:
-        print(f'\nThe numbers is {min([x[0] for x in result])}')
+    print(f'\nThe trench can hold {result} cubic meters of lava')
 
 
 
@@ -310,8 +365,7 @@ if __name__ == "__main__":
     with open(input, "r") as input_file:
         raw_data = [line.rstrip() for line in input_file.readlines( )]
 
-    main(TEST_DATA)
-    main(raw_data)
+    # main(TEST_DATA)
+    # main(raw_data)
     # main(TEST_DATA, part_two = True)
-    # main(raw_data, part_two = True)
-
+    main(raw_data, part_two = True)
