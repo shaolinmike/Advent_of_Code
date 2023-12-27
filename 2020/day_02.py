@@ -66,44 +66,34 @@ Your puzzle answer was 711.
 Both parts of this puzzle are complete! They provide two gold stars: **
 '''
 
-
-
-def check_password_rental(data):
+def check_password(data, part_two = False):
     results = []
 
     for datum in data:
-        password = datum[1]
-        password_key = datum[0][0]
-        valid_indexes = datum[0][1]
-
-        hits = password.count(password_key)
-
-        if valid_indexes[0] <= hits <= valid_indexes[1]:
-            results.append((datum, True))
-
-    return results
-
-
-def check_password_toboggan(data):
-    results = []
-
-    for datum in data:
-        password = datum[1]
-        password_key = datum[0][0]
-        valid_indexes = datum[0][1]
-
         is_valid = False
 
-        for idx in valid_indexes:
-            idx_base0 = idx - 1
+        password = datum[1]
+        password_key = datum[0][0]
+        valid_indexes = datum[0][1]
 
-            if idx_base0 > len(password):
-                is_valid = False
+        # Rental password policy
+        if not part_two:
+            hits = password.count(password_key)
+            if valid_indexes[0] <= hits <= valid_indexes[1]:
+                results.append((datum, True))
 
-            # Set validity, depending on how many times the password key is found
-            else:
-                if password[idx_base0] == password_key:
-                    is_valid = not is_valid
+        # Toboggan password policy
+        else:
+            for idx in valid_indexes:
+                idx_base0 = idx - 1
+
+                if idx_base0 > len(password):
+                    is_valid = False
+
+                # Set validity, depending on how many times the password key is found
+                else:
+                    if password[idx_base0] == password_key:
+                        is_valid = not is_valid
 
         if is_valid:
             results.append((datum, is_valid))
@@ -128,9 +118,9 @@ def main(raw_data, part_two = False):
     result = []
 
     if not part_two:
-        result = check_password_rental(data)
+        result = check_password(data)
     else:
-        result = check_password_toboggan(data)
+        result = check_password(data, part_two = part_two)
 
     print(f'{len(result)} passwords are valid')
 
