@@ -1,144 +1,166 @@
-'''
+"""
 --- Day 4: Passport Processing ---
 
-You arrive at the airport only to realize that you grabbed your North Pole Credentials instead of your passport. While these documents are extremely similar, North Pole Credentials aren't issued by a country and therefore aren't actually valid documentation for travel in most of the world.
+You arrive at the airport only to realize that you grabbed your North Pole
+Credentials instead of your passport. While these documents are extremely
+similar, North Pole Credentials aren't issued by a country and therefore
+aren't actually valid documentation for travel in most of the world.
 
-It seems like you're not the only one having problems, though; a very long line has formed for the automatic passport scanners, and the delay could upset your travel itinerary.
+It seems like you're not the only one having problems, though; a very long
+line has formed for the automatic passport scanners, and the delay could
+upset your travel itinerary.
 
-Due to some questionable network security, you realize you might be able to solve both of these problems at the same time.
+Due to some questionable network security, you realize you might be able to
+solve both of these problems at the same time.
 
-The automatic passport scanners are slow because they're having trouble detecting which passports have all required fields. The expected fields are as follows:
+The automatic passport scanners are slow because they're having trouble
+detecting which passports have all required fields. The expected fields are
+as follows:
 
-	byr (Birth Year)
-	iyr (Issue Year)
-	eyr (Expiration Year)
-	hgt (Height)
-	hcl (Hair Color)
-	ecl (Eye Color)
-	pid (Passport ID)
-	cid (Country ID)
+    byr (Birth Year)
+    iyr (Issue Year)
+    eyr (Expiration Year)
+    hgt (Height)
+    hcl (Hair Color)
+    ecl (Eye Color)
+    pid (Passport ID)
+    cid (Country ID)
 
-Passport data is validated in batch files (your puzzle input). Each passport is represented as a sequence of key:value pairs separated by spaces or newlines. Passports are separated by blank lines.
+Passport data is validated in batch files (your puzzle input). Each
+passport is represented as a sequence of key:value pairs separated by
+spaces or newlines. Passports are separated by blank lines.
 
 Here is an example batch file containing four passports:
 
-	ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
-	byr:1937 iyr:2017 cid:147 hgt:183cm
+    ecl:gry pid:860033327 eyr:2020 hcl:#fffffd
+    byr:1937 iyr:2017 cid:147 hgt:183cm
 
-	iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
-	hcl:#cfa07d byr:1929
+    iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884
+    hcl:#cfa07d byr:1929
 
-	hcl:#ae17e1 iyr:2013
-	eyr:2024
-	ecl:brn pid:760753108 byr:1931
-	hgt:179cm
+    hcl:#ae17e1 iyr:2013
+    eyr:2024
+    ecl:brn pid:760753108 byr:1931
+    hgt:179cm
 
-	hcl:#cfa07d eyr:2025 pid:166559648
-	iyr:2011 ecl:brn hgt:59in
+    hcl:#cfa07d eyr:2025 pid:166559648
+    iyr:2011 ecl:brn hgt:59in
 
-The first passport is valid - all eight fields are present. The second passport is invalid - it is missing hgt (the Height field).
+The first passport is valid - all eight fields are present. The second
+passport is invalid - it is missing hgt (the Height field).
 
-The third passport is interesting; the only missing field is cid, so it looks like data from North Pole Credentials, not a passport at all! Surely, nobody would mind if you made the system temporarily ignore missing cid fields. Treat this "passport" as valid.
+The third passport is interesting; the only missing field is cid, so it
+looks like data from North Pole Credentials, not a passport at all! Surely,
+nobody would mind if you made the system temporarily ignore missing cid
+fields. Treat this "passport" as valid.
 
-The fourth passport is missing two fields, cid and byr. Missing cid is fine, but missing any other field is not, so this passport is invalid.
+The fourth passport is missing two fields, cid and byr. Missing cid is
+fine, but missing any other field is not, so this passport is invalid.
 
-According to the above rules, your improved system would report 2 valid passports.
+According to the above rules, your improved system would report 2 valid
+passports.
 
-Count the number of valid passports - those that have all required fields. Treat cid as optional. In your batch file, how many passports are valid?
+Count the number of valid passports - those that have all required fields.
+Treat cid as optional. In your batch file, how many passports are valid?
 
 Your puzzle answer was 216.
 
 --- Part Two ---
 
-The line is moving more quickly now, but you overhear airport security talking about how passports with invalid data are getting through. Better add some data validation, quick!
+The line is moving more quickly now, but you overhear airport security
+talking about how passports with invalid data are getting through. Better
+add some data validation, quick!
 
-You can continue to ignore the cid field, but each other field has strict rules about what values are valid for automatic validation:
+You can continue to ignore the cid field, but each other field has strict
+rules about what values are valid for automatic validation:
 
-	byr (Birth Year) - four digits; at least 1920 and at most 2002.
-	iyr (Issue Year) - four digits; at least 2010 and at most 2020.
-	eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
-	hgt (Height) - a number followed by either cm or in:
-		If cm, the number must be at least 150 and at most 193.
-		If in, the number must be at least 59 and at most 76.
-	hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
-	ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
-	pid (Passport ID) - a nine-digit number, including leading zeroes.
-	cid (Country ID) - ignored, missing or not.
+    byr (Birth Year) - four digits; at least 1920 and at most 2002.
+    iyr (Issue Year) - four digits; at least 2010 and at most 2020.
+    eyr (Expiration Year) - four digits; at least 2020 and at most 2030.
+    hgt (Height) - a number followed by either cm or in:
+        If cm, the number must be at least 150 and at most 193.
+        If in, the number must be at least 59 and at most 76.
+    hcl (Hair Color) - a # followed by exactly six characters 0-9 or a-f.
+    ecl (Eye Color) - exactly one of: amb blu brn gry grn hzl oth.
+    pid (Passport ID) - a nine-digit number, including leading zeroes.
+    cid (Country ID) - ignored, missing or not.
 
-Your job is to count the passports where all required fields are both present and valid according to the above rules. Here are some example values:
+Your job is to count the passports where all required fields are both
+present and valid according to the above rules. Here are some example
+values:
 
-	byr valid:   2002
-	byr invalid: 2003
+    byr valid:   2002
+    byr invalid: 2003
 
-	hgt valid:   60in
-	hgt valid:   190cm
-	hgt invalid: 190in
-	hgt invalid: 190
+    hgt valid:   60in
+    hgt valid:   190cm
+    hgt invalid: 190in
+    hgt invalid: 190
 
-	hcl valid:   #123abc
-	hcl invalid: #123abz
-	hcl invalid: 123abc
+    hcl valid:   #123abc
+    hcl invalid: #123abz
+    hcl invalid: 123abc
 
-	ecl valid:   brn
-	ecl invalid: wat
+    ecl valid:   brn
+    ecl invalid: wat
 
-	pid valid:   000000001
-	pid invalid: 0123456789
+    pid valid:   000000001
+    pid invalid: 0123456789
 
 Here are some invalid passports:
 
-	eyr:1972 cid:100
-	hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
+    eyr:1972 cid:100
+    hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926
 
-	iyr:2019
-	hcl:#602927 eyr:1967 hgt:170cm
-	ecl:grn pid:012533040 byr:1946
+    iyr:2019
+    hcl:#602927 eyr:1967 hgt:170cm
+    ecl:grn pid:012533040 byr:1946
 
-	hcl:dab227 iyr:2012
-	ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277
+    hcl:dab227 iyr:2012
+    ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277
 
-	hgt:59cm ecl:zzz
-	eyr:2038 hcl:74454a iyr:2023
-	pid:3556412378 byr:2007
+    hgt:59cm ecl:zzz
+    eyr:2038 hcl:74454a iyr:2023
+    pid:3556412378 byr:2007
 
 Here are some valid passports:
 
-	pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
-	hcl:#623a2f
+    pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980
+    hcl:#623a2f
 
-	eyr:2029 ecl:blu cid:129 byr:1989
-	iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm
+    eyr:2029 ecl:blu cid:129 byr:1989
+    iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm
 
-	hcl:#888785
-	hgt:164cm byr:2001 iyr:2015 cid:88
-	pid:545766238 ecl:hzl
-	eyr:2022
+    hcl:#888785
+    hgt:164cm byr:2001 iyr:2015 cid:88
+    pid:545766238 ecl:hzl
+    eyr:2022
 
-	iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
+    iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719
 
-Count the number of valid passports - those that have all required fields and valid values. Continue to treat cid as optional. In your batch file, how many passports are valid?
+Count the number of valid passports - those that have all required fields
+and valid values. Continue to treat cid as optional. In your batch file,
+how many passports are valid?
 
 Your puzzle answer was 150.
 
-Both parts of this puzzle are complete! They provide two gold stars: **'''
-
-import ast
-
+Both parts of this puzzle are complete! They provide two gold stars: **
+"""
 
 test_data = [ 'ecl:gry pid:860033327 eyr:2020 hcl:#fffffd byr:1937 iyr:2017 cid:147 hgt:183cm',
-				  'iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884 hcl:#cfa07d byr:1929',
-				  'hcl:#ae17e1 iyr:2013 eyr:2024 ecl:brn pid:760753108 byr:1931 hgt:179cm',
-				  'hcl:#cfa07d eyr:2025 pid:166559648 iyr:2011 ecl:brn hgt:59in' ]
+              'iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884 hcl:#cfa07d byr:1929',
+              'hcl:#ae17e1 iyr:2013 eyr:2024 ecl:brn pid:760753108 byr:1931 hgt:179cm',
+              'hcl:#cfa07d eyr:2025 pid:166559648 iyr:2011 ecl:brn hgt:59in']
 
 test_data_2 = [ 'eyr:1972 cid:100 hcl:#18171d ecl:amb hgt:170 pid:186cm iyr:2018 byr:1926',
-					'iyr:2019 hcl:#602927 eyr:1967 hgt:170cm ecl:grn pid:012533040 byr:1946',
-					'hcl:dab227 iyr:2012 ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277',
-					'hgt:59cm ecl:zzz eyr:2038 hcl:74454a iyr:2023 pid:3556412378 byr:2007' ]
+                'iyr:2019 hcl:#602927 eyr:1967 hgt:170cm ecl:grn pid:012533040 byr:1946',
+                'hcl:dab227 iyr:2012 ecl:brn hgt:182cm pid:021572410 eyr:2020 byr:1992 cid:277',
+                'hgt:59cm ecl:zzz eyr:2038 hcl:74454a iyr:2023 pid:3556412378 byr:2007']
 
 test_data_3 = [ 'pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980 hcl:#623a2f',
-					'eyr:2029 ecl:blu cid:129 byr:1989 iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm',
-					'hcl:#888785 hgt:164cm byr:2001 iyr:2015 cid:88 pid:545766238 ecl:hzl eyr:2022',
-					'iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719' ]
+                'eyr:2029 ecl:blu cid:129 byr:1989 iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm',
+                'hcl:#888785 hgt:164cm byr:2001 iyr:2015 cid:88 pid:545766238 ecl:hzl eyr:2022',
+                'iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719']
 
 BYR = 'byr'
 IYR = 'iyr'
@@ -149,94 +171,101 @@ ECL = 'ecl'
 PID = 'pid'
 CID = 'cid'
 
-passport_fields = [ BYR, IYR, EYR, HGT, HCL, ECL, PID, CID ]
+PASSPORT_FIELDS = [BYR, IYR, EYR, HGT, HCL, ECL, PID, CID]
 
 
-def verify_data( passport_entry, expanded_check = True ):
-	result = True
-	missing_fields = [ ]
+def verify_data(data, part_two = True):
+    results = []
 
-	for field in passport_fields:
-		if field not in passport_entry.keys( ):
-			missing_fields.append( field )
+    for passport_entry in data:
+        missing_fields = []
+        result = True
 
-			if field != 'cid':
-				result = False
+        for valid_field in PASSPORT_FIELDS:
+            # Early out for part two if the field isn't valid
+            if valid_field not in passport_entry.keys():
+                missing_fields.append(valid_field)
 
-		if expanded_check and field not in missing_fields:
-			if field == BYR:
-				result = result and int( passport_entry[ BYR ] ) in range( 1920, 2003 )
+                if valid_field != 'cid':
+                    result = False
 
-			if field == IYR:
-				result = result and int( passport_entry[ IYR ] ) in range( 2010, 2021 )
+            elif part_two:
+                if valid_field == BYR:
+                    result = result and int(passport_entry[BYR]) in range(1920, 2003)
 
-			if field == EYR:
-				result = result and int( passport_entry[ EYR ] ) in range( 2020, 2031 )
+                if valid_field == IYR:
+                    result = result and int(passport_entry[IYR]) in range(2010, 2021)
 
-			if field == HGT:
-				height = passport_entry[ HGT ]
-				height_val = 0
-				if 'cm' in height:
-					height_val = int( height.split( 'cm' )[ 0 ] )
-					result = result and int( height_val ) in range( 150, 194 )
+                if valid_field == EYR:
+                    result = result and int(passport_entry[EYR]) in range(2020, 2031)
 
-				elif 'in' in height:
-					height_val = int( height.split( 'in' )[ 0 ] )
-					result = result and int( height_val ) in range( 59, 77 )
+                if valid_field == HGT:
+                    height = passport_entry[HGT]
+                    height_val = 0
+                    if 'cm' in height:
+                        height_val = int(height.split('cm')[0])
+                        result = result and int(height_val) in range(150, 194)
 
-				else:
-					result = False
+                    elif 'in' in height:
+                        height_val = int(height.split('in')[0])
+                        result = result and int(height_val) in range(59, 77)
 
-			if field == HCL:
-				if passport_entry[ HCL ][ 0 ] != '#':
-					result = False
+                    else:
+                        result = False
 
-				else:
-					hair_col = passport_entry[ HCL ].replace( '#', '' )
+                if valid_field == HCL:
+                    if passport_entry[HCL][0] != '#':
+                        result = False
 
-					if len( hair_col ) != 6:
-						result = False
-					elif len( hair_col ) == 6:
-						result = result and int( hair_col, 16 )
+                    else:
+                        hair_col = passport_entry[HCL].replace('#', '')
 
-			if field == ECL:
-				eye_colors = [ 'amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth' ]
-				result = result and passport_entry[ ECL ] in eye_colors
+                        if len(hair_col) != 6:
+                            result = False
+                        elif len(hair_col) == 6:
+                            result = result and int(hair_col, 16)
 
-			if field == PID:
-				pid = passport_entry[ PID ]
-				if len( pid ) == 9:
-					result = result and type( int( pid ) ) == int
-				else:
-					result = False
+                if valid_field == ECL:
+                    eye_colors = ['amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth']
+                    result = result and passport_entry[ECL] in eye_colors
 
-	return result
+                if valid_field == PID:
+                    pid = passport_entry[PID]
+                    if len(pid) == 9:
+                        result = result and type(int(pid)) == int
+                    else:
+                        result = False
+        if result:
+            results.append((valid_field, result))
+
+    return results
 
 
-def main( data, expanded_check = True ):
-	data_dict = { }
-	valid_entries = 0
+def parse_data(raw_data):
+    data = []
 
-	for line_num, line in enumerate( data ):
-		new_attributes = ast.literal_eval( "{'" + line.strip( ).replace( '\n', ' ' ).replace( ' ', "', '" ).replace( ":", "' : '" ) + "'}" )
-		data_dict.update( new_attributes )
+    for datum in raw_data:
+        result = eval("{'" + datum.strip().replace('\n', ' ').replace(' ', "', '").replace(":", "' : '") + "'}")
+        data.append(result)
 
-		result = verify_data( data_dict, expanded_check = expanded_check )
+    return data
 
-		if result:
-			valid_entries += 1
 
-		data_dict = { }
+def main(raw_data, part_two = False):
+    data = parse_data(raw_data)
 
-	print( "\nValid number of entries: {0}".format( valid_entries ) )
+    result = verify_data(data, part_two = part_two)
+    print(f'\nValid number of entries: {len(result)}')
+
 
 
 if __name__ == "__main__":
-	input = r'D:\Projects\Python\Personal\Advent_of_Code\2020\day_04_input.txt'
-	# input = r'D:\Dropbox\Projects\Python\Advent_of_Code\2020\day_04_input.txt'
+    filename = __file__.split('\\')[-1].split('.')[0]
+    input = rf"D:\Projects\Advent_of_Code\2020\{filename}_input.txt"
+    raw_data = []
 
-	with open( input, 'r' ) as input_file:
-		raw_data = input_file.read( ).split( '\n\n' )
+    with open(input, 'r') as input_file:
+        raw_data = input_file.read().split('\n\n')
 
-	main( raw_data, expanded_check = False )
-	main( raw_data )
+    main(raw_data)
+    main(raw_data, part_two = True)
